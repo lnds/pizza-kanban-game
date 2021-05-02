@@ -64,6 +64,8 @@ defmodule PizzaKanbanGameWeb.Board.Table do
     send_update(__MODULE__, id: table_id, toppings: table)
     if has_crust?(table) do
       send_update(__MODULE__, id: table_id, button_visible: "visible")
+    else
+      send_update(__MODULE__, id: table_id, button_visible: "invisible")
     end
   end
 
