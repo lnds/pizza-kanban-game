@@ -1,13 +1,14 @@
 defmodule PizzaKanbanGameWeb.PizzaGameLive do
-  use PizzaKanbanGameWeb, :live_view
+  use Surface.LiveView
 
   alias PizzaKanbanGameWeb.Router.Helpers, as: Routes
-
-  require Logger
-
   alias PizzaKanbanGameWeb.Board.{Table, Pantry, Kitchen, Oven, Dispatch, PlayersBoard}
   alias PizzaKanbanGameWeb.PlayerStore
   alias PizzaKanbanGame.Game
+
+  require Logger
+
+  data game_id, :string, default: ""
 
   @impl true
   def render(assigns) do
@@ -17,7 +18,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
           <img src="<%= Routes.static_path(PizzaKanbanGameWeb.Endpoint, "/images/app_logo.png") %>" alt="Pizza Kanban Simulator"/>
         </a>
       </header>
-      <div class="font-sans antialiased flex w-screen h-full">
+      <div id="game" class="font-sans antialiased flex w-screen h-full">
           <%= live_component @socket, Pantry, id: "pantry" %>
           <%= live_component @socket, Kitchen, id: "kitchen" %>
           <%= live_component @socket, Oven, id: "oven" %>
@@ -29,7 +30,8 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
 
   @impl true
   def handle_params(%{"game_id" => game_id}, _uri, socket) do
-    Logger.info("!!game_id : #{inspect(game_id)}")
+    Kitchen.set_game_id(game_id)
+    socket = socket |> assign(:game_id, game_id)
     {:noreply, socket}
   end
 
@@ -41,8 +43,10 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   end
 
   @impl true
-  def handle_info({:drop_topping, {topping, table}}, socket) do
-    Table.push_topping(table, topping)
+  def handle_info({:drop_topping, {game, topping, table}}, socket) do
+    game_id = socket.assigns.game_id
+    Logger.info("game id is = #{game_id}")
+    if game == game_id, do: Table.push_topping(table, topping)
     {:noreply, socket}
   end
 

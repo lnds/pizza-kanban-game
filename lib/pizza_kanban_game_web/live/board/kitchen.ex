@@ -3,13 +3,13 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
   use Surface.LiveComponent
 
   alias PizzaKanbanGame.Game
-  alias PizzaKanbanGameWeb.PizzaGameLive
   alias PizzaKanbanGameWeb.Board.Table
 
   require Logger
 
   @topic "kitchen_events"
 
+  data game_id, :string, default: ""
   data pizzas, :integer, default: 0
   data ingredients, :integer, default: 0
 
@@ -28,7 +28,7 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
               Cocina
               <span class="mx-4 flex flex-inline w-max mb-2 font-normal text-base">
                 <ul class="ml-auto flex justify-items-center">
-                <li class="flex-col mx-2">Pizzas: {{ @pizzas }}</li>
+                <li class="flex-col mx-2">Game Id: {{ @game_id }}</li>
                 <li class="flex-col mx-2">Ingredients: {{ @ingredients }}</li>
                 </ul>
               </span>
@@ -47,7 +47,8 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
   def handle_event("drop", %{"topping" => topping, "image" => image, "to" => table}, socket) do
     Logger.info("drop #{topping} to table #{table}")
     topping = %{topping: topping, image: image}
-    Game.broadcast(@topic, :drop_topping, {topping, table})
+    game_id = get_game_id(socket)
+    Game.broadcast(@topic, :drop_topping, {game_id, topping, table})
     {:noreply, socket }
   end
 
@@ -57,6 +58,11 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
     {:noreply, socket}
   end
 
+  def set_game_id(id) do
+    send_update(__MODULE__, id: "kitchen", game_id: id)
+  end
 
-
+  def get_game_id(socket) do
+    socket.assigns.game_id
+  end
 end

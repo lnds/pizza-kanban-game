@@ -6,6 +6,7 @@ defmodule PizzaKanbanGame.Game do
             pizzas: 0,
             quality: 0.0,
             tables: [],
+            plates: [],
             state: :not_started
 
   @type t() :: %__MODULE__{}
@@ -19,6 +20,7 @@ defmodule PizzaKanbanGame.Game do
       name: name,
       players: [player]
     }
+
 
 
   def subscribe(topic) do
