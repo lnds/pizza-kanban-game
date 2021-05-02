@@ -4,10 +4,13 @@ defmodule PizzaKanbanGameWeb.Board.Table do
   require Logger
 
   alias PizzaKanbanGameWeb.Board.Oven
+  alias PizzaKanbanGameWeb.GameStore
 
   prop name, :string, required: true
+  prop game_id, :string, required: true
   data toppings, :list, default: []
   data button_visible, :string, default: "invisible"
+  prop created, :boolean, default: false
 
 
   def render(assigns) do
@@ -65,10 +68,27 @@ defmodule PizzaKanbanGameWeb.Board.Table do
     {:ok, socket}
   end
 
-  def update(assigns, socket) do
-    {:ok, assign(socket, assigns)}
-  end
 
+  def update(assigns, socket) do
+    if not assigns.created do
+      Logger.info("NOT CREATED!!")
+      {:ok, table} = GameStore.get(assigns.game_id) |> GameStore.get_table(assigns.name)
+      if table != nil do
+        Logger.info("GABLE = #{inspect(table)}")
+        assigns = %{assigns| created: true} |> Map.put(:toppings, table)
+        has_crust = Enum.find(table, fn(topping) -> topping.topping ==  "pizza_crust" end)
+        if has_crust do
+          assigns = assigns |> Map.put(:button_visible, "visible")
+          {:ok, assign(socket, assigns)}
+        else
+          {:ok, assign(socket, assigns)}
+        end
+      else
+        assigns = %{assigns| created: true}
+        {:ok, assign(socket, assigns)}
+      end
+    end
+  end
 
   def push_topping(table_id, topping) do
     send_update(__MODULE__, id: table_id, new_topping: topping)
@@ -81,4 +101,10 @@ defmodule PizzaKanbanGameWeb.Board.Table do
   def clear(table_id) do
     send_update(__MODULE__, id: table_id, toppings: [], button_visible: "invisible")
   end
+
+  def set(table_id, toppings) do
+    send_update(__MODULE__, id: table_id, toppings: toppings)
+  end
+
+
 end

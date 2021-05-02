@@ -9,6 +9,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
 
   require Logger
 
+
   data game_id, :string, default: ""
 
   @impl true
@@ -31,12 +32,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
 
   @impl true
   def handle_params(%{"game_id" => game_id}, _uri, socket) do
-    {status, _game} = GameStore.get(game_id)
-    if status == :error do
-      {:ok, player} = PlayerStore.create()
-      game = Game.new_with_id(game_id, player.name, player)
-      GameStore.save(game)
-    end
+    GameStore.get(game_id) |> create_game(game_id)
     Kitchen.set_game_id(game_id)
     socket = socket |> assign(:game_id, game_id)
     {:noreply, socket}
@@ -55,5 +51,20 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
     if game.id == game_id, do: Table.push_topping(table, topping)
     {:noreply, socket}
   end
+
+  def handle_info({:pop_topping, game, {table}}, socket) do
+    game_id = socket.assigns.game_id
+    if game.id == game_id, do: Table.pop_topping(table)
+    {:noreply, socket}
+  end
+
+  defp create_game({:error, _reason}, game_id) do
+    {:ok, player} = PlayerStore.create()
+    game = Game.new_with_id(game_id, player.name, player)
+    GameStore.save(game)
+  end
+
+  defp create_game({:ok, game}=result, _game_id), do: result
+
 
 end
