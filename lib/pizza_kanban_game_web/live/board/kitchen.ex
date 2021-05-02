@@ -67,8 +67,7 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
     {:ok, game} = GameStore.get(game_id)
       |> GameStore.pop_table(table)
     Table.refresh(game, table)
-
-      #|> Game.broadcast(@topic, :update_table, table)
+    Game.broadcast({:ok, game}, @topic, :update_table, table)
     {:noreply, socket}
   end
 
