@@ -4,17 +4,20 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
 
   alias PizzaKanbanGame.Game
   alias PizzaKanbanGameWeb.Board.Table
+  alias PizzaKanbanGameWeb.GameStore
+
 
   require Logger
 
   @topic "kitchen_events"
 
-  data game_id, :string, default: ""
+  prop game_id, :string, default: ""
   data pizzas, :integer, default: 0
   data ingredients, :integer, default: 0
 
   def mount(socket) do
     if connected?(socket), do: Game.subscribe(@topic)
+    Logger.info("MOUNT #{inspect(socket.assigns)}")
     {:ok, socket}
   end
 
@@ -28,8 +31,7 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
               Cocina
               <span class="mx-4 flex flex-inline w-max mb-2 font-normal text-base">
                 <ul class="ml-auto flex justify-items-center">
-                <li class="flex-col mx-2">Game Id: {{ @game_id }}</li>
-                <li class="flex-col mx-2">Ingredients: {{ @ingredients }}</li>
+                  <li>game id: {{@game_id}}</li>
                 </ul>
               </span>
             </h3>
@@ -45,10 +47,14 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
 
 
   def handle_event("drop", %{"topping" => topping, "image" => image, "to" => table}, socket) do
-    Logger.info("drop #{topping} to table #{table}")
+    Logger.info("drop topping")
     topping = %{topping: topping, image: image}
     game_id = get_game_id(socket)
-    Game.broadcast(@topic, :drop_topping, {game_id, topping, table})
+    Logger.info("get game_id #{inspect(game_id)}")
+
+    GameStore.get(game_id)
+      |> GameStore.update_table(table, topping)
+      |> Game.broadcast(@topic, :drop_topping, {topping, table})
     {:noreply, socket }
   end
 

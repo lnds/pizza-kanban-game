@@ -5,7 +5,7 @@ defmodule PizzaKanbanGame.Game do
             score: 0,
             pizzas: 0,
             quality: 0.0,
-            tables: [],
+            tables: %{},
             plates: [],
             state: :not_started
 
@@ -21,14 +21,23 @@ defmodule PizzaKanbanGame.Game do
       players: [player]
     }
 
+  def new_with_id(id, name, player),
+    do: %Game{
+      id: id,
+      name: name,
+      players: [player]
+    }
+
 
 
   def subscribe(topic) do
     Phoenix.PubSub.subscribe(PizzaKanbanGame.PubSub, topic)
   end
 
-  def broadcast(topic, event, data) do
-    Phoenix.PubSub.broadcast(PizzaKanbanGame.PubSub, topic, {event, data})
+  def broadcast({:error, _reason} = error, _topic, _event, _data), do: error
+
+  def broadcast({:ok, game}, topic, event, data) do
+    Phoenix.PubSub.broadcast(PizzaKanbanGame.PubSub, topic, {event, game, data})
   end
 
 end

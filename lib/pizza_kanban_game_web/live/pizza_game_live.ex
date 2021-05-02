@@ -5,6 +5,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   alias PizzaKanbanGameWeb.Board.{Table, Pantry, Kitchen, Oven, Dispatch, PlayersBoard}
   alias PizzaKanbanGameWeb.PlayerStore
   alias PizzaKanbanGame.Game
+  alias PizzaKanbanGameWeb.GameStore
 
   require Logger
 
@@ -20,7 +21,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
       </header>
       <div id="game" class="font-sans antialiased flex w-screen h-full">
           <%= live_component @socket, Pantry, id: "pantry" %>
-          <%= live_component @socket, Kitchen, id: "kitchen" %>
+          <%= live_component @socket, Kitchen, id: "kitchen", game_id: @game_id %>
           <%= live_component @socket, Oven, id: "oven" %>
           <%= live_component @socket, Dispatch, id: "dispatch" %>
           <%= live_component @socket, PlayersBoard, id: "players" %>
@@ -30,6 +31,12 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
 
   @impl true
   def handle_params(%{"game_id" => game_id}, _uri, socket) do
+    {status, _game} = GameStore.get(game_id)
+    if status == :error do
+      {:ok, player} = PlayerStore.create()
+      game = Game.new_with_id(game_id, player.name, player)
+      GameStore.save(game)
+    end
     Kitchen.set_game_id(game_id)
     socket = socket |> assign(:game_id, game_id)
     {:noreply, socket}
@@ -38,15 +45,14 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   def handle_params(%{}, _uri, socket) do
     {:ok, player} = PlayerStore.create()
     game = Game.new(player.name, player)
-    send_update(PlayersBoard, id: "players", players: game.players)
+    GameStore.save(game)
     {:noreply, push_redirect(socket,  to: "/#{game.id}", replace: true)}
   end
 
   @impl true
-  def handle_info({:drop_topping, {game, topping, table}}, socket) do
+  def handle_info({:drop_topping, game, {topping, table}}, socket) do
     game_id = socket.assigns.game_id
-    Logger.info("game id is = #{game_id}")
-    if game == game_id, do: Table.push_topping(table, topping)
+    if game.id == game_id, do: Table.push_topping(table, topping)
     {:noreply, socket}
   end
 
