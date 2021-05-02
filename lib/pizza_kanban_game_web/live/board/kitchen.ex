@@ -49,29 +49,30 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
 
 
   def handle_event("drop", %{"topping" => topping, "image" => image, "to" => table}, socket) do
-    Logger.info("drop topping")
+    Logger.info("drop topping #{inspect(table)}")
     topping = %{topping: topping, image: image}
     game_id = get_game_id(socket)
     Logger.info("get game_id #{inspect(game_id)}")
-    GameStore.get(game_id)
+    {:ok, game} = GameStore.get(game_id)
       |> GameStore.update_table(table, topping)
-      |> Game.broadcast(@topic, :drop_topping, {topping, table})
+    Table.refresh(game, table)
+    Logger.info("enviando broadcast")
+    Game.broadcast({:ok, game}, @topic, :update_table, table)
     {:noreply, socket }
   end
 
   def handle_event("pop", %{"from" => table}, socket) do
+    Logger.info("pop #{inspect(table)}")
     game_id = get_game_id(socket)
-    GameStore.get(game_id)
+    {:ok, game} = GameStore.get(game_id)
       |> GameStore.pop_table(table)
-      |> Game.broadcast(@topic, :pop_topping, {table})
+    Table.refresh(game, table)
+
+      #|> Game.broadcast(@topic, :update_table, table)
     {:noreply, socket}
   end
 
-  def set_game_id(id) do
-    send_update(__MODULE__, id: "kitchen", game_id: id)
-  end
-
-  def get_game_id(socket) do
+  defp get_game_id(socket) do
     socket.assigns.game_id
   end
 end

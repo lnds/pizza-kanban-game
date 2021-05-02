@@ -42,60 +42,8 @@ defmodule PizzaKanbanGameWeb.Board.Table do
     {:noreply, socket}
   end
 
-  def update(%{new_topping: topping}, socket) do
-    Logger.info("add topping #{inspect(topping)}!!")
-    if topping.topping == "pizza_crust" do
-      if length(socket.assigns.toppings) == 0 do
-        socket = socket
-              |> assign(:button_visible, "visible")
-              |> assign(:toppings, socket.assigns.toppings ++ [topping])
-        {:ok, socket}
-      else
-        {:ok, socket}
-      end
-    else
-      if socket.assigns.button_visible == "visible" || length(socket.assigns.toppings) == 0 do
-        socket = socket |> assign(:toppings, socket.assigns.toppings ++ [topping])
-        {:ok, socket}
-      else
-        {:ok, socket}
-      end
-    end
-  end
-
-  def update(%{pop_topping: _}, socket) do
-    socket = socket |> assign(:toppings, Enum.drop(socket.assigns.toppings, -1))
-    {:ok, socket}
-  end
-
-
-  def update(assigns, socket) do
-    if not assigns.created do
-      Logger.info("NOT CREATED!!")
-      {:ok, table} = GameStore.get(assigns.game_id) |> GameStore.get_table(assigns.name)
-      if table != nil do
-        Logger.info("GABLE = #{inspect(table)}")
-        assigns = %{assigns| created: true} |> Map.put(:toppings, table)
-        has_crust = Enum.find(table, fn(topping) -> topping.topping ==  "pizza_crust" end)
-        if has_crust do
-          assigns = assigns |> Map.put(:button_visible, "visible")
-          {:ok, assign(socket, assigns)}
-        else
-          {:ok, assign(socket, assigns)}
-        end
-      else
-        assigns = %{assigns| created: true}
-        {:ok, assign(socket, assigns)}
-      end
-    end
-  end
-
   def push_topping(table_id, topping) do
     send_update(__MODULE__, id: table_id, new_topping: topping)
-  end
-
-  def pop_topping(table_id) do
-    send_update(__MODULE__, id: table_id, pop_topping: "")
   end
 
   def clear(table_id) do
@@ -104,6 +52,12 @@ defmodule PizzaKanbanGameWeb.Board.Table do
 
   def set(table_id, toppings) do
     send_update(__MODULE__, id: table_id, toppings: toppings)
+  end
+
+  def refresh(game, table_id) do
+    Logger.info("refresh #{inspect(game)} #{inspect(table_id)}")
+    table = game.tables[table_id]
+    send_update(__MODULE__, id: table_id, toppings: table)
   end
 
 

@@ -33,7 +33,6 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   @impl true
   def handle_params(%{"game_id" => game_id}, _uri, socket) do
     GameStore.get(game_id) |> create_game(game_id)
-    Kitchen.set_game_id(game_id)
     socket = socket |> assign(:game_id, game_id)
     {:noreply, socket}
   end
@@ -46,17 +45,15 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   end
 
   @impl true
-  def handle_info({:drop_topping, game, {topping, table}}, socket) do
+  def handle_info({:update_table, game, table}, socket) do
     game_id = socket.assigns.game_id
-    if game.id == game_id, do: Table.push_topping(table, topping)
+    if game.id == game_id do
+      {:ok, game} = GameStore.get(game.id)
+      Table.refresh(game, table)
+    end
     {:noreply, socket}
   end
 
-  def handle_info({:pop_topping, game, {table}}, socket) do
-    game_id = socket.assigns.game_id
-    if game.id == game_id, do: Table.pop_topping(table)
-    {:noreply, socket}
-  end
 
   defp create_game({:error, _reason}, game_id) do
     {:ok, player} = PlayerStore.create()
@@ -64,7 +61,9 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
     GameStore.save(game)
   end
 
-  defp create_game({:ok, game}=result, _game_id), do: result
+  defp create_game({:ok, game}, _game_id) do
+    Enum.each(Map.keys(game.tables), fn table_id -> Table.refresh(game, table_id) end)
+  end
 
 
 end
