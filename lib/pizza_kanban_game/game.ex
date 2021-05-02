@@ -20,4 +20,13 @@ defmodule PizzaKanbanGame.Game do
       players: [player]
     }
 
+
+  def subscribe(topic) do
+    Phoenix.PubSub.subscribe(PizzaKanbanGame.PubSub, topic)
+  end
+
+  def broadcast(topic, event, data) do
+    Phoenix.PubSub.broadcast(PizzaKanbanGame.PubSub, topic, {event, data})
+  end
+
 end

@@ -41,18 +41,9 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   end
 
   @impl true
-  def handle_info({:drop_topping, topping, table}, socket) do
+  def handle_info({:drop_topping, {topping, table}}, socket) do
     Table.push_topping(table, topping)
     {:noreply, socket}
-  end
-
-  def subscribe do
-    Logger.info("subcribing")
-    Phoenix.PubSub.subscribe(PizzaKanbanGame.PubSub, "kitchen_events")
-  end
-
-  def broadcast(event, data, component) do
-    Phoenix.PubSub.broadcast(PizzaKanbanGame.PubSub, "kitchen_events", {event, data, component})
   end
 
 end

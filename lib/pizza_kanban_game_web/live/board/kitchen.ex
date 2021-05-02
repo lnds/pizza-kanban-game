@@ -2,17 +2,19 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
 
   use Surface.LiveComponent
 
+  alias PizzaKanbanGame.Game
   alias PizzaKanbanGameWeb.PizzaGameLive
   alias PizzaKanbanGameWeb.Board.Table
 
   require Logger
 
+  @topic "kitchen_events"
 
   data pizzas, :integer, default: 0
   data ingredients, :integer, default: 0
 
   def mount(socket) do
-    if connected?(socket), do: PizzaGameLive.subscribe()
+    if connected?(socket), do: Game.subscribe(@topic)
     {:ok, socket}
   end
 
@@ -44,7 +46,8 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
 
   def handle_event("drop", %{"topping" => topping, "image" => image, "to" => table}, socket) do
     Logger.info("drop #{topping} to table #{table}")
-    PizzaGameLive.broadcast(:drop_topping, %{topping: topping, image: image}, table)
+    topping = %{topping: topping, image: image}
+    Game.broadcast(@topic, :drop_topping, {topping, table})
     {:noreply, socket }
   end
 
