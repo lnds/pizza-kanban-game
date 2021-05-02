@@ -55,4 +55,15 @@ defmodule PizzaKanbanGameWeb.GameStore do
     end
   end
 
+  def clear_table({:error, _reason}=error, _table_name), do: error
+
+  def clear_table({:ok, %Game{id: id, tables: tables}=game}, table_name) do
+    if tables == nil do
+      {:ok, []}
+    else
+      new_game = %{game | tables: Map.put(tables, table_name, [])}
+      {:ok, persist(id, new_game)}
+    end
+  end
+
 end

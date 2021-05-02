@@ -52,11 +52,9 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
     Logger.info("drop topping #{inspect(table)}")
     topping = %{topping: topping, image: image}
     game_id = get_game_id(socket)
-    Logger.info("get game_id #{inspect(game_id)}")
     {:ok, game} = GameStore.get(game_id)
       |> GameStore.update_table(table, topping)
     Table.refresh(game, table)
-    Logger.info("enviando broadcast")
     Game.broadcast({:ok, game}, @topic, :update_table, table)
     {:noreply, socket }
   end

@@ -38,7 +38,11 @@ defmodule PizzaKanbanGameWeb.Board.Table do
 
   def handle_event("cook", _, socket) do
     Logger.info("cook")
-    Oven.put_pizza(socket.assigns.toppings, socket.assigns.name)
+    game_id = get_game_id(socket)
+    table = socket.assigns.id
+    {:ok, game} = GameStore.get(game_id)
+      |> GameStore.clear_table(table)
+    refresh(game, table)
     {:noreply, socket}
   end
 
@@ -47,6 +51,7 @@ defmodule PizzaKanbanGameWeb.Board.Table do
   end
 
   def clear(table_id) do
+    GameStore
     send_update(__MODULE__, id: table_id, toppings: [], button_visible: "invisible")
   end
 
@@ -55,10 +60,24 @@ defmodule PizzaKanbanGameWeb.Board.Table do
   end
 
   def refresh(game, table_id) do
-    Logger.info("refresh #{inspect(game)} #{inspect(table_id)}")
     table = game.tables[table_id]
     send_update(__MODULE__, id: table_id, toppings: table)
+    if has_crust?(table) do
+      send_update(__MODULE__, id: table_id, button_visible: "visible")
+    end
   end
 
+
+  defp get_game_id(socket) do
+    socket.assigns.game_id
+  end
+
+  defp has_crust?(nil), do: false
+
+  defp has_crust?([%{topping: "pizza_crust",}]), do: true
+
+  defp has_crust?([%{topping: "pizza_crust",}|_]), do: true
+
+  defp has_crust?(_), do: false
 
 end
