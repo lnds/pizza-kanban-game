@@ -1,5 +1,5 @@
-defmodule PizzaKanbanGameWeb.GameStore do
-  use PizzaKanbanGameWeb.Store
+defmodule PizzaKanbanGame.GameStore do
+  use PizzaKanbanGame.Store
   alias PizzaKanbanGame.Game
 
   require Logger

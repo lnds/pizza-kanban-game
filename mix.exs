@@ -47,7 +47,8 @@ defmodule PizzaKanbanGame.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:surface, "~> 0.3.0"}
+      {:surface, "~> 0.3.0"},
+      {:struct_access, "~> 1.1.2"}
     ]
   end
 

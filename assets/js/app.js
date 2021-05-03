@@ -26,9 +26,8 @@ Hooks.Topping = {
             e.dataTransfer.dropEffect = "move";
             e.dataTransfer.setData("topping", e.target.attributes['data-topping'].value);
             e.dataTransfer.setData("image", e.target.attributes['src'].value);
+            e.dataTransfer.setData("from", e.target.attributes['data-from'].value);
             let table = e.target.attributes['data-table'];
-            console.log("e", e);
-            console.log("table");
             console.log(table);
             if (table !== undefined) {
                 e.dataTransfer.setData("table", table.value);
@@ -50,8 +49,9 @@ Hooks.Crust = {
             e.preventDefault();
             var topping = e.dataTransfer.getData("topping");
             var image = e.dataTransfer.getData("image");
+            var from = e.dataTransfer.getData("from");
             let to = e.target.attributes['phx-value-name'].value;
-            this.pushEventTo("#kitchen", "drop", {"topping": topping, "image": image, "to": to});
+            this.pushEventTo("#kitchen", "drop", {"topping": topping, "image": image, "to": to, "from": from});
             let table = e.dataTransfer.getData("table");
             console.log("crust table", table);
             if (table !== undefined && table !== "") {

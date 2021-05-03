@@ -9,10 +9,12 @@ defmodule PizzaKanbanGame.Application do
     children = [
       # Start the PubSub system
       {Phoenix.PubSub, name: PizzaKanbanGame.PubSub},
+      PizzaKanbanGame.GameStore,
+      PizzaKanbanGame.PlayerStore,
+      PizzaKanbanGame.PantryStore,
       # Start the Endpoint (http/https)
       PizzaKanbanGameWeb.Endpoint,
-      PizzaKanbanGameWeb.GameStore,
-      PizzaKanbanGameWeb.PlayerStore,
+
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

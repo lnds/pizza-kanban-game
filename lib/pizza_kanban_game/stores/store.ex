@@ -1,4 +1,4 @@
-defmodule PizzaKanbanGameWeb.Store do
+defmodule PizzaKanbanGame.Store do
   defmacro __using__(_) do
     quote do
       use Agent

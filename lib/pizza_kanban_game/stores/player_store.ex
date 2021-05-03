@@ -1,5 +1,5 @@
-defmodule PizzaKanbanGameWeb.PlayerStore do
-  use PizzaKanbanGameWeb.Store
+defmodule PizzaKanbanGame.PlayerStore do
+  use PizzaKanbanGame.Store
   alias PizzaKanbanGame.{Player, Utils, Namer}
 
   def save(%{id: id, name: name}) do

@@ -3,8 +3,8 @@ defmodule PizzaKanbanGameWeb.Board.Table do
 
   require Logger
 
+  alias PizzaKanbanGame.GameStore
   alias PizzaKanbanGameWeb.Board.Oven
-  alias PizzaKanbanGameWeb.GameStore
 
   prop name, :string, required: true
   prop game_id, :string, required: true
@@ -24,6 +24,7 @@ defmodule PizzaKanbanGameWeb.Board.Table do
             src="{{topping.image}}"
               data-topping="{{topping.topping}}"
               data-table="{{@name}}"
+              data-from="{{@name}}"
               phx-value-name="{{@name}}"
               phx-hook="Topping">
         </div>
@@ -74,9 +75,9 @@ defmodule PizzaKanbanGameWeb.Board.Table do
 
   defp has_crust?(nil), do: false
 
-  defp has_crust?([%{topping: "pizza_crust",}]), do: true
+  defp has_crust?([%{topping: "crust",}]), do: true
 
-  defp has_crust?([%{topping: "pizza_crust",}|_]), do: true
+  defp has_crust?([%{topping: "crust",}|_]), do: true
 
   defp has_crust?(_), do: false
 

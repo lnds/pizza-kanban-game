@@ -7,13 +7,13 @@ defmodule PizzaKanbanGameWeb.Pizza.Topping do
   prop image, :string, required: false
   prop alt, :string, required: false, default: ""
   prop draggable, :boolean, required: false, default: true
-
+  prop from, :string, required: false, default: ""
 
   def render(assigns) do
     ~H"""
         <img src="{{ Routes.static_path(PizzaKanbanGameWeb.Endpoint, "/images/#{@image}") }}"
               alt="{{@alt}}" draggable="{{@draggable}}"
-              id="{{@id}}" phx-hook="Topping" class="z-auto w-full" data-topping="{{@id}}">
+              id="{{@id}}" phx-hook="Topping" class="z-auto w-full" data-topping="{{@id}}" data-from="{{@from}}">
       """
   end
 end
