@@ -5,7 +5,7 @@ defmodule PizzaKanbanGameWeb.Board.Pantry do
 
   data ingredients, :list, default: [
     %{name: "pizza_crust", image: "pizza_crust.png", alt: "masa"},
-    %{name: "sauce", image: "tomato-sauce.png", alt: "salsa"},
+    %{name: "sauce", image: "sauce.png", alt: "salsa"},
     %{name: "cheese", image: "cheese.png", alt: "queso"},
     %{name: "salami", image: "salami.png", alt: "salami"},
     %{name: "green_peppers", image: "green_peppers.png", alt: "pimentón"},
