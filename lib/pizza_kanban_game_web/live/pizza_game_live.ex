@@ -11,6 +11,8 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
 
 
   data game_id, :string, default: ""
+  data oven_clock, :integer, default: 0
+  data oven_clock_active, :boolean, default: false
 
   @impl true
   def render(assigns) do
@@ -54,6 +56,20 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
     {:noreply, socket}
   end
 
+  def handle_info(:oven_clock_start, socket) do
+    :timer.send_after(1000, self(), :oven_tick)
+    {:noreply, socket |> assign(oven_clock_active: true)}
+  end
+
+  def handle_info(:oven_tick, socket) do
+    oven_clock = socket.assigns.oven_clock + 1
+    Oven.tick(oven_clock, socket.assigns.oven_clock_active)
+    {:noreply, socket |> assign(oven_clock: oven_clock)}
+  end
+
+  def handle_info(:oven_clock_stop, socket) do
+    {:noreply, socket |> assign(oven_clock_active: false) |> assign(oven_clock: -1)}
+  end
 
   defp create_game({:error, _reason}, game_id) do
     {:ok, player} = PlayerStore.create()
