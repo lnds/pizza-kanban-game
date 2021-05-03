@@ -40,19 +40,17 @@ defmodule PizzaKanbanGameWeb.Board.Table do
     Logger.info("cook")
     game_id = get_game_id(socket)
     table = socket.assigns.id
-    {:ok, game} = GameStore.get(game_id)
-      |> GameStore.clear_table(table)
-    refresh(game, table)
+    {result, game} = GameStore.get(game_id) |> GameStore.put_pizza_in_oven(socket.assigns.toppings) |> GameStore.clear_table(table)
+    Logger.info("result = #{inspect(result)} game = #{inspect(game)}")
+    if result == :ok do
+      Oven.refresh(game)
+      refresh(game, table)
+    end
     {:noreply, socket}
   end
 
   def push_topping(table_id, topping) do
     send_update(__MODULE__, id: table_id, new_topping: topping)
-  end
-
-  def clear(table_id) do
-    GameStore
-    send_update(__MODULE__, id: table_id, toppings: [], button_visible: "invisible")
   end
 
   def set(table_id, toppings) do

@@ -3,10 +3,10 @@ defmodule PizzaKanbanGameWeb.Board.Oven do
 
   require Logger
   alias PizzaKanbanGameWeb.Board.Plate
-  alias PizzaKanbanGameWeb.Board.Table
 
-  @limit 2
   data pizzas, :list, default: []
+  prop game_id, :string, default: ""
+
 
   def render(assigns) do
     ~H"""
@@ -39,23 +39,11 @@ defmodule PizzaKanbanGameWeb.Board.Oven do
     """
   end
 
-  def update(%{new_pizza: pizza, table: table}, socket) do
-    Logger.info("add pizza #{inspect(pizza)} table = #{inspect(table)}!!")
-    if length(socket.assigns.pizzas) < @limit do
-      socket = socket |> assign(:pizzas, socket.assigns.pizzas ++ [pizza])
-      Table.clear(table)
-      {:ok, socket}
-    else
-      {:ok, socket}
-    end
+  def refresh(game) do
+    pizzas = game.plates
+    Logger.info("pizzas in oven = #{inspect(pizzas)}")
+    send_update(__MODULE__, id: "oven", pizzas: pizzas)
   end
 
-  def update(assigns, socket) do
-    {:ok, assign(socket, assigns)}
-  end
 
-  def put_pizza(toppings, from) do
-    Logger.info("put pizza #{inspect(toppings)}, from #{inspect(from)}")
-    send_update(__MODULE__, id: "oven", new_pizza: toppings, table: from)
-  end
 end

@@ -23,7 +23,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
       <div id="game" class="font-sans antialiased flex w-screen h-full">
           <%= live_component @socket, Pantry, id: "pantry" %>
           <%= live_component @socket, Kitchen, id: "kitchen", game_id: @game_id %>
-          <%= live_component @socket, Oven, id: "oven" %>
+          <%= live_component @socket, Oven, id: "oven", game_id: @game_id %>
           <%= live_component @socket, Dispatch, id: "dispatch" %>
           <%= live_component @socket, PlayersBoard, id: "players" %>
         </div>
@@ -63,6 +63,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
 
   defp create_game({:ok, game}, _game_id) do
     Enum.each(Map.keys(game.tables), fn table_id -> Table.refresh(game, table_id) end)
+    Oven.refresh(game)
   end
 
 
