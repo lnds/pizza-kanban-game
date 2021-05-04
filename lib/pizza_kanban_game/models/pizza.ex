@@ -21,7 +21,11 @@ defmodule PizzaKanbanGame.Models.Pizza do
   def new(_), do: nil
 
   def add_ingredient(pizza, ingredient) do
+    if Enum.find(pizza.ingredients, fn i -> i.id == ingredient.id end) do
+      {:error, pizza}
+    else
       ingredients = Enum.sort([ingredient | pizza.ingredients], &(&1.order <= &2.order))
-      %Pizza{pizza | ingredients: ingredients}
+      {:ok, %Pizza{pizza | ingredients: ingredients} }
+    end
   end
 end

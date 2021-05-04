@@ -2,7 +2,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   use Surface.LiveView
 
   alias PizzaKanbanGameWeb.Router.Helpers, as: Routes
-  alias PizzaKanbanGameWeb.Board.{Table, PantryWidget, Kitchen, Oven, Dispatch, PlayersBoard}
+  alias PizzaKanbanGameWeb.Board.{PantryWidget, KitchenWidget, Oven, Dispatch, PlayersBoard}
   alias PizzaKanbanGame.PlayerStore
   alias PizzaKanbanGame.Game
   alias PizzaKanbanGame.GameStore
@@ -24,7 +24,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
       </header>
       <div id="game" class="font-sans antialiased flex w-screen h-full">
           <%= live_component @socket, PantryWidget, id: "pantry", game_id: @game_id %>
-          <%= live_component @socket, Kitchen, id: "kitchen", game_id: @game_id %>
+          <%= live_component @socket, KitchenWidget, id: "kitchen", game_id: @game_id %>
           <%= live_component @socket, Oven, id: "oven", game_id: @game_id %>
           <%= live_component @socket, Dispatch, id: "dispatch" %>
         </div>
@@ -50,7 +50,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
     game_id = socket.assigns.game_id
     if game.id == game_id do
       {:ok, game} = GameStore.get(game.id)
-      Table.refresh(game, table)
+      KitchenWidget.refresh(game.kitchen)
     end
     {:noreply, socket}
   end
@@ -87,8 +87,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
 
   defp create_game({:ok, game}, _game_id) do
     PantryWidget.refresh(game.pantry)
-    Enum.each(Map.keys(game.tables), fn table_id -> Table.refresh(game, table_id) end)
-    Oven.refresh(game)
+    KitchenWidget.refresh(game.kitchen)
   end
 
 

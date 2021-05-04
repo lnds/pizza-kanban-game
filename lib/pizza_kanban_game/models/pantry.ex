@@ -50,7 +50,7 @@ defmodule PizzaKanbanGame.Models.Pantry do
     ) |> validate_slot_change(pantry)
   end
 
-  @spec remove_ingredient(Pantry.t(), String.t()) :: {:error, :empty_slot} | {:ok, Pantry.t()}
+  @spec remove_ingredient(Pantry.t(), String.t()) :: {:error, :empty_slot, nil} | {:ok, Pantry.t(), PantrySlot.t()}
   def remove_ingredient(pantry, ing) do
     add_ingredient(pantry, ing, -1)
   end
@@ -66,10 +66,10 @@ defmodule PizzaKanbanGame.Models.Pantry do
 
 
   defp validate_slot_change({[changed_slot|_], slots}, pantry) when changed_slot.quantity > 0 do
-    {:ok,  %Pantry{pantry | slots: slots}}
+    {:ok,  %Pantry{pantry | slots: slots}, changed_slot}
   end
 
-  defp validate_slot_change(_, _), do: {:error, :empty_slot}
+  defp validate_slot_change(_, _), do: {:error, :empty_slot, nil}
 
 
 end

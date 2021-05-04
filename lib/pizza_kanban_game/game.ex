@@ -2,18 +2,20 @@ defmodule PizzaKanbanGame.Game do
   defstruct id: nil,
             name: nil,
             players: [],
+            kitchen: nil,
+            pantry: nil,
             score: 0,
             pizzas: 0,
             quality: 0.0,
-            tables: %{},
-            pantry: nil,
             plates: [],
             state: :not_started
 
   @type t() :: %__MODULE__{}
 
   alias PizzaKanbanGame.{Game, Utils}
-  alias PizzaKanbanGame.Models.Pantry
+  alias PizzaKanbanGame.Models.{Kitchen, Pantry}
+
+  @default_table_count 9
 
   @spec new(String.t(), PizzaKanbanGame.Player.t()) :: PizzaKanbanGame.Game.t()
   def new(name, player),
@@ -22,6 +24,7 @@ defmodule PizzaKanbanGame.Game do
       name: name,
       players: [player],
       pantry: Pantry.new(),
+      kitchen: Kitchen.new(@default_table_count)
     }
 
   def new_with_id(id, name, player),
@@ -30,6 +33,7 @@ defmodule PizzaKanbanGame.Game do
       name: name,
       players: [player],
       pantry: Pantry.new(),
+      kitchen: Kitchen.new(@default_table_count)
     }
 
 

@@ -1,11 +1,11 @@
-defmodule PizzaKanbanGameWeb.Board.Kitchen do
+defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
 
   use Surface.LiveComponent
 
   alias PizzaKanbanGame.Game
   alias PizzaKanbanGame.GameStore
-  alias PizzaKanbanGame.Models.Pantry
-  alias PizzaKanbanGameWeb.Board.{Table, PantryWidget}
+  alias PizzaKanbanGame.Models.{Kitchen, Pantry}
+  alias PizzaKanbanGameWeb.Board.{TableWidget, PantryWidget}
 
 
   require Logger
@@ -15,8 +15,8 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
   def topic, do: @topic
 
   prop game_id, :string, default: ""
-  data pizzas, :integer, default: 0
-  data ingredients, :integer, default: 0
+  data tables, :list, default: []
+
 
   def mount(socket) do
     if connected?(socket), do: Game.subscribe(@topic)
@@ -41,19 +41,18 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
           <!-- end header -->
         </div>
         <div class="flex flex-wrap justify-center gap-4">
-            <Table :for={{ table <- 1..9}} id="table-{{table}}" name="table-{{table}}" game_id="{{@game_id}}" />
+            <TableWidget :for={{ table <- @tables }} id="{{table.id}}" table={{table}} game_id="{{@game_id}}" />
         </div>
       </div>
     """
   end
 
 
-  def handle_event("drop", %{"topping" => topping, "image" => image, "to" => table, "from" => from}, socket) do
-    topping = %{topping: topping, image: image}
+  def handle_event("drop", %{"topping" => topping, "image" => _image, "to" => table_name, "from" => from}, socket) do
+    Logger.info("drop topping #{topping}")
     get_game_id(socket)
       |> GameStore.get()
-      |> GameStore.update_table(table, topping)
-      |> drop_topping(socket, from, topping.topping, table)
+      |> drop_topping(socket, from, topping, table_name)
   end
 
   def handle_event("pop", %{"from" => table}, socket) do
@@ -71,18 +70,17 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
     Game.broadcast({:ok, game}, @topic, :update_pantry, nil)
   end
 
+  def refresh(kitchen) do
+    Logger.info("REFRESH kitchen = #{inspect(kitchen)}")
+    send_update(__MODULE__, id: "kitchen", tables: kitchen.tables)
+  end
 
   # do the drop topping stuff
 
   defp drop_topping({:error, _}, socket, _, _, _), do: {:noreply, socket}
 
-  defp drop_topping({:ok, game}, socket, "pantry", topping, table) do
-    {:ok, pantry} = Pantry.remove_ingredient(game.pantry, topping)
-    game = %Game{game | pantry: pantry}
-    PantryWidget.refresh(pantry)
-    GameStore.save(game)
-    Game.broadcast({:ok, game}, @topic, :update_pantry, nil)
-    refresh_table({:ok, game}, socket, table) ## reuse impl from below
+  defp drop_topping({:ok, game}, socket, "pantry", topping, table_name) do
+    Pantry.remove_ingredient(game.pantry, topping) |> put_topping_on_table(socket, game, table_name)
   end
 
   defp drop_topping({:ok, game}, socket, _, _, table) do
@@ -90,9 +88,24 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
   end
 
   defp refresh_table({:ok, game}, socket, table) do
-    Table.refresh(game, table)
     Game.broadcast({:ok, game}, @topic, :update_table, table)
     {:noreply, socket }
   end
 
+  defp put_topping_on_table({:ok, pantry, slot}, socket, game, table_name) do
+    Kitchen.drop(game.kitchen, table_name, slot.ingredient)
+      |> validate_drop(socket, game, pantry)
+  end
+
+  defp validate_drop({:error, _table}, socket, _, _), do: {:noreply, socket}
+
+  defp validate_drop({:ok, table}, socket, game, pantry) do
+    game = %Game{game | pantry: pantry, kitchen: Kitchen.update_table(game.kitchen, table)}
+    PantryWidget.refresh(pantry)
+    refresh(game.kitchen)
+    GameStore.save(game)
+    Game.broadcast({:ok, game}, @topic, :update_pantry, nil)
+    {:noreply, socket }
+
+  end
 end
