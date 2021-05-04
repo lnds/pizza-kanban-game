@@ -53,20 +53,10 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
     Logger.info("drop topping to = #{inspect(table)}, from = #{inspect(from)}")
     topping = %{topping: topping, image: image}
     game_id = get_game_id(socket)
-    {:ok, game} = GameStore.get(game_id) |> GameStore.update_table(table, topping)
-    if from == "pantry" do
-      {:ok, pantry} = Pantry.remove_ingredient(game.pantry, topping.topping)
-      game = %Game{game | pantry: pantry}
-      Table.refresh(game, table)
-      PantryWidget.refresh(pantry)
-      GameStore.save(game)
-      Game.broadcast({:ok, game}, @topic, :update_table, table)
-      Game.broadcast({:ok, game}, @topic, :update_pantry, nil)
-    else
-      Table.refresh(game, table)
-      Game.broadcast({:ok, game}, @topic, :update_table, table)
-    end
-    {:noreply, socket }
+
+    GameStore.get(game_id)
+      |> GameStore.update_table(table, topping)
+      |> drop_topping(socket, from, topping, table)
   end
 
   def handle_event("pop", %{"from" => table}, socket) do
@@ -87,4 +77,24 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
     Game.broadcast({:ok, game}, @topic, :update_pantry, nil)
   end
 
+  defp drop_topping({:error, _}, socket, _, _, _), do: {:noreply, socket}
+
+
+  defp drop_topping({:ok, game}, socket, "pantry", topping, table) do
+    {:ok, pantry} = Pantry.remove_ingredient(game.pantry, topping.topping)
+    game = %Game{game | pantry: pantry}
+    Table.refresh(game, table)
+    PantryWidget.refresh(pantry)
+    GameStore.save(game)
+    Game.broadcast({:ok, game}, @topic, :update_table, table)
+    Game.broadcast({:ok, game}, @topic, :update_pantry, nil)
+    {:noreply, socket }
+
+  end
+
+  defp drop_topping({:ok, game}, socket, _, _, table) do
+    Table.refresh(game, table)
+    Game.broadcast({:ok, game}, @topic, :update_table, table)
+    {:noreply, socket }
+  end
 end
