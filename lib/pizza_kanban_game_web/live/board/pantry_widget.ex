@@ -21,8 +21,7 @@ defmodule PizzaKanbanGameWeb.Board.PantryWidget do
     """
   end
 
-  def refresh(game) do
-    {:ok, pantry} = PantryStore.find_game_pantry(game.id)
+  def refresh(pantry) do
     send_update(__MODULE__, id: "pantry", slots: pantry.slots)
   end
 

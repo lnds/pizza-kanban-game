@@ -3,13 +3,14 @@ defmodule PizzaKanbanGame.Models.Pantry do
   use StructAccess
 
   defstruct id: nil,
-            game_id: nil,
             slots: []
 
   @type t() :: %__MODULE__{}
 
   alias PizzaKanbanGame.Utils
   alias PizzaKanbanGame.Models.{Pantry, PantrySlot, Ingredient}
+
+  require Logger
 
   @crust %Ingredient{id: "crust", display_name: "masa", image: "pizza_crust.png", cost: 100, order: 0, kind: :crust}
   @sauce %Ingredient{id: "sauce", display_name: "salsa", image: "sauce.png", cost: 50, order: 1, kind: :base}
@@ -25,11 +26,10 @@ defmodule PizzaKanbanGame.Models.Pantry do
 
   @default_quantity 10
 
-  @spec new(String.t()) :: PizzaKanbanGame.Models.Pantry.t()
-  def new(game_id),
+  @spec new :: PizzaKanbanGame.Models.Pantry.t()
+  def new(),
     do: %Pantry {
       id: Utils.id(),
-      game_id: game_id,
       slots: [
         PantrySlot.new(@crust, @default_quantity),
         PantrySlot.new(@sauce, @default_quantity),
@@ -43,4 +43,18 @@ defmodule PizzaKanbanGame.Models.Pantry do
       ]
     }
 
+  @spec remove_ingredient(Pantry.t(), String.t()) :: {:error, :empty_slot} | {:ok, Pantry.t()}
+  def remove_ingredient(pantry, ing) do
+    {changed_slot, slots} =  get_and_update_in(pantry.slots, [Access.filter(fn slot -> Utils.string_equals?(slot.ingredient.id, ing) end)], fn slot -> {slot, %PantrySlot{slot| quantity: slot.quantity-1}} end)
+    if length(changed_slot) == 0 do
+      {:error, :empty_slot}
+    else
+      [changed_slot|_] = changed_slot
+      if changed_slot.quantity > 0 do
+        {:ok,  %Pantry{pantry | slots: slots}}
+      else
+        {:error, :empty_slot}
+      end
+    end
+  end
 end

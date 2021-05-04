@@ -3,7 +3,8 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
   use Surface.LiveComponent
 
   alias PizzaKanbanGame.Game
-  alias PizzaKanbanGame.{GameStore, PantryStore}
+  alias PizzaKanbanGame.GameStore
+  alias PizzaKanbanGame.Models.Pantry
   alias PizzaKanbanGameWeb.Board.{Table, PantryWidget}
 
 
@@ -52,14 +53,15 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
     Logger.info("drop topping to = #{inspect(table)}, from = #{inspect(from)}")
     topping = %{topping: topping, image: image}
     game_id = get_game_id(socket)
+    {:ok, game} = GameStore.get(game_id) |> GameStore.update_table(table, topping)
     if from == "pantry" do
-      if PantryWidget.remove_ingredient(game_id, topping.topping) do
-        {:ok, game} = GameStore.get(game_id) |> GameStore.update_table(table, topping)
-        Table.refresh(game, table)
-        Game.broadcast({:ok, game}, @topic, :update_table, table)
-      end
+      {:ok, pantry} = Pantry.remove_ingredient(game.pantry, topping.topping)
+      game = %Game{game | pantry: pantry}
+      Table.refresh(game, table)
+      PantryWidget.refresh(pantry)
+      GameStore.save(game)
+      Game.broadcast({:ok, game}, @topic, :update_table, table)
     else
-      {:ok, game} = GameStore.get(game_id) |> GameStore.update_table(table, topping)
       Table.refresh(game, table)
       Game.broadcast({:ok, game}, @topic, :update_table, table)
     end

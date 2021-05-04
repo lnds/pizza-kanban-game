@@ -11,7 +11,6 @@ defmodule PizzaKanbanGame.Application do
       {Phoenix.PubSub, name: PizzaKanbanGame.PubSub},
       PizzaKanbanGame.GameStore,
       PizzaKanbanGame.PlayerStore,
-      PizzaKanbanGame.PantryStore,
       # Start the Endpoint (http/https)
       PizzaKanbanGameWeb.Endpoint,
 

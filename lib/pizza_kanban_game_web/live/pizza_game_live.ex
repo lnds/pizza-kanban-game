@@ -78,7 +78,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   end
 
   defp create_game({:ok, game}, _game_id) do
-    PantryWidget.refresh(game)
+    PantryWidget.refresh(game.pantry)
     Enum.each(Map.keys(game.tables), fn table_id -> Table.refresh(game, table_id) end)
     Oven.refresh(game)
   end
