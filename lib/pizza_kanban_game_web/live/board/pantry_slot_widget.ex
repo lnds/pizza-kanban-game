@@ -13,7 +13,6 @@ defmodule PizzaKanbanGameWeb.Board.PantrySlotWidget do
   prop game_id, :string, default: ""
 
   def render(assigns) do
-    draggable = assigns.slot.quantity > 0
     ~H"""
       <div class="relative flex flex-col items-center">
         <div class=" bg-white h-12 w-12 flex items-center justify-center text-black text-2xl font-semibold rounded-3xl mb-1 overflow-hidden">

@@ -1,7 +1,6 @@
 defmodule PizzaKanbanGameWeb.Board.PantryWidget do
   use Surface.LiveComponent
 
-  alias PizzaKanbanGame.PantryStore
   alias PizzaKanbanGameWeb.Board.PantrySlotWidget
 
   prop game_id, :string, default: ""
@@ -25,16 +24,5 @@ defmodule PizzaKanbanGameWeb.Board.PantryWidget do
     send_update(__MODULE__, id: "pantry", slots: pantry.slots)
   end
 
-  def remove_ingredient(game_id, topping) do
-    Logger.info("remove ingredient <- #{inspect(topping)}")
 
-    {result, pantry} = PantryStore.find_game_pantry(game_id) |> PantryStore.remove_ingredient(topping)
-    if result == :ok do
-      Logger.info("remove ingredient #{inspect(pantry)}")
-      send_update(__MODULE__, id: "pantry", slots: pantry.slots)
-      true
-    else
-      false
-    end
-  end
 end
