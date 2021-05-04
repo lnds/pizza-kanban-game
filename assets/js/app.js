@@ -23,12 +23,12 @@ let Hooks = {}
 Hooks.Topping = {
     mounted() {
         this.el.addEventListener("dragstart", e => {
-            e.dataTransfer.dropEffect = "move";
-            e.dataTransfer.setData("topping", e.target.attributes['data-topping'].value);
+            e.dataTransfer.dropEffect = "copy";
+            let topping_id = e.target.attributes['data-topping'].value;
+            e.dataTransfer.setData("topping",topping_id );
             e.dataTransfer.setData("image", e.target.attributes['src'].value);
             e.dataTransfer.setData("from", e.target.attributes['data-from'].value);
             let table = e.target.attributes['data-table'];
-            console.log(table);
             if (table !== undefined) {
                 e.dataTransfer.setData("table", table.value);
             }
@@ -53,7 +53,6 @@ Hooks.Crust = {
             let to = e.target.attributes['phx-value-name'].value;
             this.pushEventTo("#kitchen", "drop", {"topping": topping, "image": image, "to": to, "from": from});
             let table = e.dataTransfer.getData("table");
-            console.log("crust table", table);
             if (table !== undefined && table !== "") {
                 this.pushEventTo("#kitchen", "pop", {"from": table});
 
