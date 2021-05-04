@@ -71,6 +71,15 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
     {:noreply, socket |> assign(oven_clock_active: false) |> assign(oven_clock: -1)}
   end
 
+  def handle_info({:update_pantry, game, _}, socket) do
+    game_id = socket.assigns.game_id
+    if game.id == game_id do
+      {:ok, game} = GameStore.get(game.id)
+      PantryWidget.refresh(game.pantry)
+    end
+    {:noreply, socket}
+  end
+
   defp create_game({:error, _reason}, game_id) do
     {:ok, player} = PlayerStore.create()
     game = Game.new_with_id(game_id, player.name, player)

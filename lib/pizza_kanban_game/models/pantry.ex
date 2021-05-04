@@ -43,6 +43,13 @@ defmodule PizzaKanbanGame.Models.Pantry do
       ]
     }
 
+  def replace_slot(pantry, new_slot) do
+    get_and_update_in(pantry.slots,
+      [Access.filter(fn slot -> Utils.string_equals?(slot.id, new_slot.id) end)],
+      fn slot -> {slot, new_slot} end
+    ) |> validate_slot_change(pantry)
+  end
+
   @spec remove_ingredient(Pantry.t(), String.t()) :: {:error, :empty_slot} | {:ok, Pantry.t()}
   def remove_ingredient(pantry, ing) do
     add_ingredient(pantry, ing, -1)

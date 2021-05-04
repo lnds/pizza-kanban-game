@@ -61,6 +61,7 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
       PantryWidget.refresh(pantry)
       GameStore.save(game)
       Game.broadcast({:ok, game}, @topic, :update_table, table)
+      Game.broadcast({:ok, game}, @topic, :update_pantry, nil)
     else
       Table.refresh(game, table)
       Game.broadcast({:ok, game}, @topic, :update_table, table)
@@ -81,4 +82,9 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
   defp get_game_id(socket) do
     socket.assigns.game_id
   end
+
+  def broad_cast(game, :update_pantry) do
+    Game.broadcast({:ok, game}, @topic, :update_pantry, nil)
+  end
+
 end
