@@ -36,4 +36,17 @@ defmodule PizzaKanbanGame.Models.Table do
   end
 
 
+  def pop_topping(%Table{content: %Ingredient{id: _}}=table) do
+    {:ok, %Table{table| content: nil}}
+  end
+
+  def pop_topping(%Table{content: %Pizza{ingredients: ingredients}}=table) do
+    new_ingredients = Enum.drop(ingredients, -1)
+    if length(new_ingredients) == 0 do
+      {:ok, %Table{table| content: nil}}
+    else
+      {:ok, %Table{table| content: %Pizza{table.content| ingredients: new_ingredients}}}
+    end
+  end
+
 end

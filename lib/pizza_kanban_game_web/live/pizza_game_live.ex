@@ -46,7 +46,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   end
 
   @impl true
-  def handle_info({:update_table, game, table}, socket) do
+  def handle_info({:update_kitchen, game, _}, socket) do
     game_id = socket.assigns.game_id
     if game.id == game_id do
       {:ok, game} = GameStore.get(game.id)

@@ -18,9 +18,12 @@ defmodule PizzaKanbanGame.Models.Kitchen do
     }
 
   def drop(kitchen, table_name, ingredient) do
-      Enum.find(kitchen.tables, fn table -> Utils.string_matches?(table.id, table_name) end) |> Table.drop(ingredient)
+    Enum.find(kitchen.tables, fn table -> Utils.string_matches?(table.id, table_name) end) |> Table.drop(ingredient)
   end
 
+  def move_topping(kitchen, _topping, _from, _to) do
+    {:ok, kitchen}
+  end
 
   def update_table(kitchen, table) do
     index = Enum.find_index(kitchen.tables, fn t -> Utils.string_matches?(t.id, table.id) end)

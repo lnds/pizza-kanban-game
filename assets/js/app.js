@@ -52,11 +52,6 @@ Hooks.Crust = {
             var from = e.dataTransfer.getData("from");
             let to = e.target.attributes['phx-value-name'].value;
             this.pushEventTo("#kitchen", "drop", {"topping": topping, "image": image, "to": to, "from": from});
-            let table = e.dataTransfer.getData("table");
-            if (table !== undefined && table !== "") {
-                this.pushEventTo("#kitchen", "pop", {"from": table});
-
-            }
         })
     }
 }
