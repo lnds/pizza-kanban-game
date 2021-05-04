@@ -20,7 +20,6 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
 
   def mount(socket) do
     if connected?(socket), do: Game.subscribe(@topic)
-    Logger.info("MOUNT #{inspect(socket.assigns)}")
     {:ok, socket}
   end
 
@@ -50,23 +49,18 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
 
 
   def handle_event("drop", %{"topping" => topping, "image" => image, "to" => table, "from" => from}, socket) do
-    Logger.info("drop topping to = #{inspect(table)}, from = #{inspect(from)}")
     topping = %{topping: topping, image: image}
-    game_id = get_game_id(socket)
-
-    GameStore.get(game_id)
+    get_game_id(socket)
+      |> GameStore.get()
       |> GameStore.update_table(table, topping)
-      |> drop_topping(socket, from, topping, table)
+      |> drop_topping(socket, from, topping.topping, table)
   end
 
   def handle_event("pop", %{"from" => table}, socket) do
-    Logger.info("pop #{inspect(table)}")
-    game_id = get_game_id(socket)
-    {:ok, game} = GameStore.get(game_id)
+    get_game_id(socket)
+      |> GameStore.get()
       |> GameStore.pop_table(table)
-    Table.refresh(game, table)
-    Game.broadcast({:ok, game}, @topic, :update_table, table)
-    {:noreply, socket}
+      |> refresh_table(socket, table)
   end
 
   defp get_game_id(socket) do
@@ -77,24 +71,28 @@ defmodule PizzaKanbanGameWeb.Board.Kitchen do
     Game.broadcast({:ok, game}, @topic, :update_pantry, nil)
   end
 
+
+  # do the drop topping stuff
+
   defp drop_topping({:error, _}, socket, _, _, _), do: {:noreply, socket}
 
-
   defp drop_topping({:ok, game}, socket, "pantry", topping, table) do
-    {:ok, pantry} = Pantry.remove_ingredient(game.pantry, topping.topping)
+    {:ok, pantry} = Pantry.remove_ingredient(game.pantry, topping)
     game = %Game{game | pantry: pantry}
-    Table.refresh(game, table)
     PantryWidget.refresh(pantry)
     GameStore.save(game)
-    Game.broadcast({:ok, game}, @topic, :update_table, table)
     Game.broadcast({:ok, game}, @topic, :update_pantry, nil)
-    {:noreply, socket }
-
+    refresh_table({:ok, game}, socket, table) ## reuse impl from below
   end
 
   defp drop_topping({:ok, game}, socket, _, _, table) do
+    refresh_table({:ok, game}, socket, table) ## reuse impl from below
+  end
+
+  defp refresh_table({:ok, game}, socket, table) do
     Table.refresh(game, table)
     Game.broadcast({:ok, game}, @topic, :update_table, table)
     {:noreply, socket }
   end
+
 end
