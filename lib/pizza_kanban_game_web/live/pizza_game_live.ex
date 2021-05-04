@@ -17,7 +17,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   @impl true
   def render(assigns) do
     ~L"""
-        <header class="">
+      <header class="">
         <a href="#" class="phx-logo">
           <img src="<%= Routes.static_path(PizzaKanbanGameWeb.Endpoint, "/images/app_logo.png") %>" alt="Pizza Kanban Simulator"/>
         </a>
@@ -27,7 +27,6 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
           <%= live_component @socket, Kitchen, id: "kitchen", game_id: @game_id %>
           <%= live_component @socket, Oven, id: "oven", game_id: @game_id %>
           <%= live_component @socket, Dispatch, id: "dispatch" %>
-          <%= live_component @socket, PlayersBoard, id: "players" %>
         </div>
     """
   end
