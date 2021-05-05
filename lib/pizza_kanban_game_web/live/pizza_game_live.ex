@@ -59,7 +59,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
     oven = socket.assigns.game.oven
     oven = Oven.turn_on(oven)
     game = %Game{socket.assigns.game| oven: oven}
-    GameStore.save(game)
+    KitchenWidget.save(game)
     :timer.send_after(1000, self(), :oven_tick)
     {:noreply, assign(socket, :game, game)}
   end
@@ -69,8 +69,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
     if oven.on do
       oven = %Oven{oven| clock: oven.clock + 1}
       game = %Game{socket.assigns.game| oven: oven}
-      OvenWidget.refresh(game)
-      GameStore.save(game)
+      KitchenWidget.save(game)
       :timer.send_after(1000, self(), :oven_tick)
       {:noreply, assign(socket, :game, game)}
     else
@@ -79,7 +78,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   end
 
   def handle_info(:oven_clock_stop, socket) do
-    {oven, plates} = Oven.turn_off(socket.assigns.game.oven) |> Oven.remove_plates()
+    {oven, _plates} = Oven.turn_off(socket.assigns.game.oven) |> Oven.remove_plates()
     game = %Game{socket.assigns.game| oven: oven}
     OvenWidget.refresh(game)
     GameStore.save(game)

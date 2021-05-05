@@ -2,7 +2,9 @@ defmodule PizzaKanbanGameWeb.Board.OvenWidget do
   use Surface.LiveComponent
 
   require Logger
-  alias PizzaKanbanGameWeb.Board.PlateWidget
+  alias PizzaKanbanGameWeb.Board.{KitchenWidget, PlateWidget}
+  alias PizzaKanbanGame.Game
+  alias PizzaKanbanGame.Models.{Oven, Plate}
 
   prop game, :struct, default: nil
   data oven, :struct, default: nil
@@ -20,13 +22,13 @@ defmodule PizzaKanbanGameWeb.Board.OvenWidget do
           </div>
         </div>
         <!-- end header -->
-        <div class="bordar-gray-600 m-4 group flex flex-row gap-4 items-center">
-          <button
+        <div class="border-gray-600 m-4 grid place-items-center">
+          <button :if={{@oven && !@oven.on}}
             :on-click="start"
-            class={{ "px-4 py-1 text-sm text-white font-semibold rounded-full border border-purple-200 hover:text-white bg-red-800 hover:bg-red-600 hover:border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2"}}>
+            class={{ "align-center px-4 py-1 text-sm text-white font-semibold rounded-full border border-purple-200 hover:text-white bg-red-800 hover:bg-red-600 hover:border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2"}}>
             encender
           </button>
-          <button
+          <button :if={{@oven && @oven.on}}
             :on-click="stop"
             class={{ "px-4 py-1 text-sm text-white font-semibold rounded-full border border-purple-200 hover:text-white bg-blue-800 hover:bg-blue-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2"}}>
             apagar
@@ -45,6 +47,9 @@ defmodule PizzaKanbanGameWeb.Board.OvenWidget do
       clock when clock < 40 -> "text-red-400"
       _ -> "text-red-600"
     end
+    plates = Enum.map(game.oven.plates, &Plate.cook(&1, game.oven.clock))
+    oven = %Oven{game.oven| plates: plates}
+    game = %Game{game | oven: oven}
     send_update(__MODULE__, id: "oven", oven: game.oven, game: game, clock_color: color)
   end
 

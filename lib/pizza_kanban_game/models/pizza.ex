@@ -10,6 +10,10 @@ defmodule PizzaKanbanGame.Models.Pizza do
 
   @type t() :: %__MODULE__{}
 
+  @raw_time 40
+
+  @burn_time 40
+
   alias PizzaKanbanGame.Utils
   alias PizzaKanbanGame.Models.{Pizza, Ingredient}
 
@@ -30,4 +34,13 @@ defmodule PizzaKanbanGame.Models.Pizza do
       {:ok, %Pizza{pizza | ingredients: ingredients} }
     end
   end
+
+  def cook(pizza, seconds) do
+    %Pizza{pizza| cook_time: seconds }
+  end
+
+  def is_burned(pizza), do: pizza.cook_time > @burn_time
+
+  def is_raw(pizza), do: pizza.cook_time < @raw_time
+
 end
