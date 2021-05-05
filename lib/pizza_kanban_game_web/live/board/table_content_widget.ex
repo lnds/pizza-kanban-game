@@ -36,7 +36,7 @@ defmodule PizzaKanbanGameWeb.Board.TableContentWidget do
   end
 
 
-  defp after_content(assigns, %Pizza{id: _}=pizza) do
+  defp after_content(assigns, %Pizza{id: _}=_pizza) do
     ~H"""
       <button
       :on-click="cook"
@@ -54,7 +54,8 @@ defmodule PizzaKanbanGameWeb.Board.TableContentWidget do
 
 
   def handle_event("cook", _, socket) do
-    Logger.info("cook")
+    pizza = socket.assigns.table.content
+    Logger.info("cook pizza = #{inspect(pizza)}")
     {:noreply, socket}
   end
 end

@@ -10,7 +10,7 @@ defmodule PizzaKanbanGameWeb.Board.PantrySlotWidget do
 
   prop slot, :struct, default: nil
   prop draggable, :boolean, default: true
-  prop game_id, :string, default: ""
+  prop game, :struct, default: nil
 
   def render(assigns) do
     ~H"""
@@ -34,20 +34,21 @@ defmodule PizzaKanbanGameWeb.Board.PantrySlotWidget do
   end
 
   def handle_event("inc", _, socket) do
-    game_id = socket.assigns.game_id
-    GameStore.get(game_id) |> inc_slot(socket)
+    inc_slot(socket)
   end
 
-  defp inc_slot({:ok, game}, socket) do
-    slot = %PantrySlot{socket.assigns.slot | quantity: socket.assigns.slot.quantity + 1}
-    Pantry.replace_slot(game.pantry, slot) |> slot_replaced(game, slot, socket)
+  defp inc_slot(socket) do
+    slot = socket.assigns.slot
+    slot = %PantrySlot{slot | quantity: slot.quantity + 1}
+    game = socket.assigns.game
+    Pantry.replace_slot(game.pantry, slot)
+    |> slot_replaced(game, slot, socket)
   end
-
-  defp inc_slot(_, socket), do: {:noreply, socket}
 
   defp slot_replaced({:ok, pantry, _}, game, slot, socket) do
     game = %Game{game | pantry: pantry}
-    GameStore.save(game) |> update_slot(slot, socket)
+    GameStore.save(game)
+    |> update_slot(slot, socket)
   end
 
   defp slot_replaced(_, _, _, socket), do: {:noreply, socket}
@@ -55,7 +56,7 @@ defmodule PizzaKanbanGameWeb.Board.PantrySlotWidget do
   defp update_slot({:ok, game}, slot, socket) do
     send_update(__MODULE__, id: socket.assigns.id, slot: slot)
     KitchenWidget.broad_cast(game, :update_pantry)
-    {:noreply, socket}
+    {:noreply, assign(socket, :game, game)}
   end
 
 end

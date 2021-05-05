@@ -1,13 +1,12 @@
-defmodule PizzaKanbanGameWeb.Board.Oven do
+defmodule PizzaKanbanGameWeb.Board.OvenWidget do
   use Surface.LiveComponent
 
   require Logger
-  alias PizzaKanbanGameWeb.Board.Plate
+  alias PizzaKanbanGameWeb.Board.PlateWidget
 
-  data pizzas, :list, default: []
-  data clock, :integer, default: 0
+  prop game, :struct, default: nil
+  data oven, :struct, default: nil
   data clock_color, :string, default: "text-blue-100"
-  prop game_id, :string, default: ""
 
   def render(assigns) do
     ~H"""
@@ -16,7 +15,7 @@ defmodule PizzaKanbanGameWeb.Board.Oven do
           <!-- header -->
           <div class="flex flex-col max-w">
             <h3 class="text-white mb-1 font-bold text-xl text-gray-100 flex flex-row max-w">
-              Horno  <span class={{ "mx-4", @clock_color,  "mx-4 px-2 border flat-right " }}>{{show_clock(@clock)}}</span>
+              Horno  <span class={{ "mx-4", @clock_color,  "mx-4 px-2 border flat-right " }}>{{show_clock(@game.oven)}}</span>
             </h3>
           </div>
         </div>
@@ -33,20 +32,23 @@ defmodule PizzaKanbanGameWeb.Board.Oven do
             apagar
           </button>
         </div>
-        <div class="flex flex-wrap justify-center gap-4">
-            <Plate :for={{ pizza <- @pizzas }} toppings={{pizza}} />
+        <div :if={{@oven}} class="flex flex-wrap justify-center gap-4">
+            <PlateWidget  :for={{ plate <- @oven.plates }} plate={{plate}} />
         </div>
       </div>
     """
   end
 
-  def refresh(game) do
-    pizzas = game.plates
-    Logger.info("pizzas in oven = #{inspect(pizzas)}")
-    send_update(__MODULE__, id: "oven", pizzas: pizzas)
+  def refresh(oven) do
+    send_update(__MODULE__, id: "oven", oven: oven)
   end
 
-  def show_clock(seconds) do
+  def show_clock(nil) do
+    "00:00"
+  end
+
+  def show_clock(oven) do
+    seconds = oven.clock
     minutes = div(seconds, 60) |> Integer.to_string |> String.pad_leading(2, "0")
     seconds = rem(seconds, 60) |> Integer.to_string |> String.pad_leading(2, "0")
     "#{minutes}:#{seconds}"

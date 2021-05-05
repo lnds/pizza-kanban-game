@@ -2,15 +2,14 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   use Surface.LiveView
 
   alias PizzaKanbanGameWeb.Router.Helpers, as: Routes
-  alias PizzaKanbanGameWeb.Board.{PantryWidget, KitchenWidget, Oven, Dispatch, PlayersBoard}
+  alias PizzaKanbanGameWeb.Board.{PantryWidget, KitchenWidget, OvenWidget}
   alias PizzaKanbanGame.PlayerStore
   alias PizzaKanbanGame.Game
   alias PizzaKanbanGame.GameStore
 
   require Logger
 
-
-  data game_id, :string, default: ""
+  data game, :struct, default: nil
   data oven_clock, :integer, default: 0
   data oven_clock_active, :boolean, default: false
 
@@ -22,19 +21,18 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
           <img src="<%= Routes.static_path(PizzaKanbanGameWeb.Endpoint, "/images/app_logo.png") %>" alt="Pizza Kanban Simulator"/>
         </a>
       </header>
-      <div id="game" class="font-sans antialiased flex w-screen h-full">
-          <%= live_component @socket, PantryWidget, id: "pantry", game_id: @game_id %>
-          <%= live_component @socket, KitchenWidget, id: "kitchen", game_id: @game_id %>
-          <%= live_component @socket, Oven, id: "oven", game_id: @game_id %>
-          <%= live_component @socket, Dispatch, id: "dispatch" %>
-        </div>
+      <main id="game" class="font-sans antialiased flex w-screen h-full h-auto ">
+        <%= live_component @socket, PantryWidget, id: "pantry", game: @game %>
+        <%= live_component @socket, KitchenWidget, id: "kitchen", game: @game %>
+        <%= live_component @socket, OvenWidget, id: "oven", game: @game %>
+      </main>
     """
   end
 
   @impl true
   def handle_params(%{"game_id" => game_id}, _uri, socket) do
-    GameStore.get(game_id) |> create_game(game_id)
-    socket = socket |> assign(:game_id, game_id)
+    game = GameStore.get(game_id) |> create_game(game_id)
+    socket = socket |> assign(:game, game)
     {:noreply, socket}
   end
 
@@ -47,47 +45,39 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
 
   @impl true
   def handle_info({:update_kitchen, game, _}, socket) do
-    game_id = socket.assigns.game_id
+    game_id = socket.assigns.game.id
     if game.id == game_id do
       {:ok, game} = GameStore.get(game.id)
-      KitchenWidget.refresh(game.kitchen)
+      KitchenWidget.refresh(game)
+      {:noreply, assign(socket, :game, game)}
+    else
+      {:noreply, socket}
     end
-    {:noreply, socket}
-  end
-
-  def handle_info(:oven_clock_start, socket) do
-    :timer.send_after(1000, self(), :oven_tick)
-    {:noreply, socket |> assign(oven_clock_active: true)}
-  end
-
-  def handle_info(:oven_tick, socket) do
-    oven_clock = socket.assigns.oven_clock + 1
-    Oven.tick(oven_clock, socket.assigns.oven_clock_active)
-    {:noreply, socket |> assign(oven_clock: oven_clock)}
-  end
-
-  def handle_info(:oven_clock_stop, socket) do
-    {:noreply, socket |> assign(oven_clock_active: false) |> assign(oven_clock: -1)}
   end
 
   def handle_info({:update_pantry, game, _}, socket) do
-    game_id = socket.assigns.game_id
+    game_id = socket.assigns.game.id
     if game.id == game_id do
       {:ok, game} = GameStore.get(game.id)
-      PantryWidget.refresh(game.pantry)
+      PantryWidget.refresh(game)
+      {:noreply, assign(socket, :game, game)}
+    else
+      {:noreply, socket}
     end
-    {:noreply, socket}
   end
 
   defp create_game({:error, _reason}, game_id) do
     {:ok, player} = PlayerStore.create()
     game = Game.new_with_id(game_id, player.name, player)
     GameStore.save(game)
+    game
   end
 
   defp create_game({:ok, game}, _game_id) do
-    PantryWidget.refresh(game.pantry)
-    KitchenWidget.refresh(game.kitchen)
+    PantryWidget.refresh(game)
+    KitchenWidget.refresh(game)
+    OvenWidget.refresh(game)
+    game
   end
 
 

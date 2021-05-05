@@ -4,10 +4,7 @@ defmodule PizzaKanbanGameWeb.Board.TableWidget do
   alias PizzaKanbanGameWeb.Board.TableContentWidget
   require Logger
 
-
-  prop game_id, :string, required: true
   prop table, :struct, default: nil
-
 
   def render(assigns) do
     ~H"""
