@@ -10,6 +10,10 @@ defmodule PizzaKanbanGame.Models.Pizza do
 
   @type t() :: %__MODULE__{}
 
+  @raw_time 30
+
+  @burn_time 40
+
   alias PizzaKanbanGame.Utils
   alias PizzaKanbanGame.Models.{Pizza, Ingredient}
 
@@ -23,7 +27,6 @@ defmodule PizzaKanbanGame.Models.Pizza do
   def new(ingredient), do: ingredient
 
   def add_ingredient(pizza, ingredient) do
-    Logger.info("ADD ingredient #{inspect(ingredient)} to pizza #{inspect(pizza)}")
     if Enum.find(pizza.ingredients, fn i -> i.id == ingredient.id end) do
       {:error, pizza}
     else
@@ -31,4 +34,17 @@ defmodule PizzaKanbanGame.Models.Pizza do
       {:ok, %Pizza{pizza | ingredients: ingredients} }
     end
   end
+
+  def cook(pizza, seconds) do
+    %Pizza{pizza| cook_time: seconds }
+  end
+
+  def is_burned(pizza), do: pizza.cook_time >= @burn_time
+
+  def is_raw(pizza), do: pizza.cook_time <= @raw_time
+
+  def raw_time(), do: @raw_time
+
+  def burn_time(), do: @burn_time
+
 end

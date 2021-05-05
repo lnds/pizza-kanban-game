@@ -4,6 +4,7 @@ defmodule PizzaKanbanGame.Game do
             players: [],
             kitchen: nil,
             pantry: nil,
+            oven: nil,
             score: 0,
             pizzas: 0,
             quality: 0.0,
@@ -13,9 +14,10 @@ defmodule PizzaKanbanGame.Game do
   @type t() :: %__MODULE__{}
 
   alias PizzaKanbanGame.{Game, Utils}
-  alias PizzaKanbanGame.Models.{Kitchen, Pantry}
+  alias PizzaKanbanGame.Models.{Kitchen, Pantry, Oven}
 
   @default_table_count 9
+  @default_oven_slots 2
 
   @spec new(String.t(), PizzaKanbanGame.Player.t()) :: PizzaKanbanGame.Game.t()
   def new(name, player),
@@ -24,7 +26,8 @@ defmodule PizzaKanbanGame.Game do
       name: name,
       players: [player],
       pantry: Pantry.new(),
-      kitchen: Kitchen.new(@default_table_count)
+      kitchen: Kitchen.new(@default_table_count),
+      oven: Oven.new(@default_oven_slots)
     }
 
   def new_with_id(id, name, player),
@@ -33,7 +36,8 @@ defmodule PizzaKanbanGame.Game do
       name: name,
       players: [player],
       pantry: Pantry.new(),
-      kitchen: Kitchen.new(@default_table_count)
+      kitchen: Kitchen.new(@default_table_count),
+      oven: Oven.new(@default_oven_slots)
     }
 
 
@@ -46,6 +50,7 @@ defmodule PizzaKanbanGame.Game do
 
   def broadcast({:ok, game}, topic, event, data) do
     Phoenix.PubSub.broadcast(PizzaKanbanGame.PubSub, topic, {event, game, data})
+    {:ok, game}
   end
 
 end
