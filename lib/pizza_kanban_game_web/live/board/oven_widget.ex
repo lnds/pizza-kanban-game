@@ -4,7 +4,7 @@ defmodule PizzaKanbanGameWeb.Board.OvenWidget do
   require Logger
   alias PizzaKanbanGameWeb.Board.{KitchenWidget, PlateWidget}
   alias PizzaKanbanGame.Game
-  alias PizzaKanbanGame.Models.{Oven, Plate}
+  alias PizzaKanbanGame.Models.{Oven, Plate, Pizza}
 
   prop game, :struct, default: nil
   data oven, :struct, default: nil
