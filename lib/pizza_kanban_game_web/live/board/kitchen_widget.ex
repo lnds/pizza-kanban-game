@@ -49,7 +49,6 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
 
 
   def handle_event("drop", %{"topping" => topping, "image" => _image, "to" => table_name, "from" => from}, socket) do
-    Logger.info("drop topping #{topping} to: #{table_name}, from: #{from}")
     get_game_id(socket)
       |> GameStore.get()
       |> drop_topping(socket, from, topping, table_name)
@@ -75,9 +74,11 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
     Pantry.remove_ingredient(game.pantry, topping) |> put_topping_on_table(socket, game, table_name)
   end
 
-  defp drop_topping({:ok, game}, socket, from, topping, to) do
-    Logger.info( "move #{inspect(topping)} from #{from} to #{to}")
-    Kitchen.move_topping(game.kitchen, topping, from, to) |> validate_move(socket, game)
+  defp drop_topping({:ok, game}, socket, from, topping_id, to) do
+    game.pantry
+      |> Pantry.get_ingredient_by_id(topping_id)
+      |> Kitchen.move_topping(game.kitchen, from, to)
+      |> validate_move(socket, game)
   end
 
   defp put_topping_on_table({:ok, pantry, slot}, socket, game, table_name) do
@@ -100,8 +101,9 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
 
   defp validate_move({:ok, kitchen}, socket, game) do
     refresh(kitchen)
-    GameStore.save(game)
-    Game.broadcast({:ok, game}, @topic, :update_kitchen, nil)
+    %Game{game| kitchen: kitchen}
+    |> GameStore.save()
+    |> Game.broadcast(@topic, :update_kitchen, nil)
     {:noreply, socket}
   end
 

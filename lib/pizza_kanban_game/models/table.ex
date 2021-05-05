@@ -27,6 +27,12 @@ defmodule PizzaKanbanGame.Models.Table do
     Pizza.add_ingredient(table.content, ingredient) |> dropped_in_pizza(table)
   end
 
+  def drop(%Table{content: %Ingredient{kind: :crust}}=table, ingredient) do
+    Pizza.new(table.content)
+      |> Pizza.add_ingredient(ingredient)
+      |> dropped_in_pizza(table)
+  end
+
   def drop(table, _), do: {:error, table}
 
   defp dropped_in_pizza({:error, _pizza}, table), do: {:error, table}
@@ -35,18 +41,17 @@ defmodule PizzaKanbanGame.Models.Table do
     {:ok, %Table{table| content: pizza} }
   end
 
+  def remove(%Table{content: nil}=table, _), do: {:error, table}
 
-  def pop_topping(%Table{content: %Ingredient{id: _}}=table) do
-    {:ok, %Table{table| content: nil}}
-  end
-
-  def pop_topping(%Table{content: %Pizza{ingredients: ingredients}}=table) do
-    new_ingredients = Enum.drop(ingredients, -1)
-    if length(new_ingredients) == 0 do
-      {:ok, %Table{table| content: nil}}
-    else
-      {:ok, %Table{table| content: %Pizza{table.content| ingredients: new_ingredients}}}
+  def remove(%Table{content: %Pizza{ingredients: ingredients}}=table, ingredient) do
+    ingredients = List.delete(ingredients, ingredient)
+    case length(ingredients)  do
+      0 -> {:ok, %Table{table| content: nil}}
+      1 -> {:ok, %Table{table| content: List.first(ingredients)}}
+      _ -> {:ok, %Table{table| content: %Pizza{table.content | ingredients: ingredients}}}
     end
   end
+
+  def remove(%Table{content: ingredient}=table, ingredient), do: {:ok, %Table{table| content: nil}}
 
 end

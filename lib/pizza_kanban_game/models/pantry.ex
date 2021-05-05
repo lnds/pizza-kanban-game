@@ -44,7 +44,12 @@ defmodule PizzaKanbanGame.Models.Pantry do
     }
 
   def get_ingredient_by_id(pantry, id) do
-    Enum.find(pantry.slots, fn s -> Utils.string_equals?(s.ingredient.id, id) end)
+    slot = Enum.find(pantry.slots, fn s -> Utils.string_equals?(s.ingredient.id, id) end)
+    if slot do
+      slot.ingredient
+    else
+      nil
+    end
   end
 
   def replace_slot(pantry, new_slot) do

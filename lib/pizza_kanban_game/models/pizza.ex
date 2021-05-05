@@ -2,6 +2,8 @@ defmodule PizzaKanbanGame.Models.Pizza do
 
   use StructAccess
 
+  require Logger
+
   defstruct id: "",
             ingredients: [],
             cook_time: 0
@@ -21,6 +23,7 @@ defmodule PizzaKanbanGame.Models.Pizza do
   def new(_), do: nil
 
   def add_ingredient(pizza, ingredient) do
+    Logger.info("ADD ingredient #{inspect(ingredient)} to pizza #{inspect(pizza)}")
     if Enum.find(pizza.ingredients, fn i -> i.id == ingredient.id end) do
       {:error, pizza}
     else
