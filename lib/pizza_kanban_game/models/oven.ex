@@ -43,4 +43,7 @@ defmodule PizzaKanbanGame.Models.Oven do
     %Oven{oven | on: false, clock: 0}
   end
 
+  def remove_plates(oven) do
+    {%Oven{oven| plates: []}, oven.plates}
+  end
 end

@@ -79,8 +79,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   end
 
   def handle_info(:oven_clock_stop, socket) do
-    oven = socket.assigns.game.oven
-    oven = Oven.turn_off(oven)
+    {oven, plates} = Oven.turn_off(socket.assigns.game.oven) |> Oven.remove_plates()
     game = %Game{socket.assigns.game| oven: oven}
     OvenWidget.refresh(game)
     GameStore.save(game)
