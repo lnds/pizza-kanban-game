@@ -4,7 +4,7 @@ defmodule PizzaKanbanGameWeb.Board.PantrySlotWidget do
   alias PizzaKanbanGame.{Game, GameStore}
   alias PizzaKanbanGame.Models.{Pantry, PantrySlot}
   alias PizzaKanbanGameWeb.Router.Helpers, as: Routes
-  alias PizzaKanbanGameWeb.Board.Kitchen
+  alias PizzaKanbanGameWeb.Board.KitchenWidget
 
   require Logger
 
@@ -34,7 +34,6 @@ defmodule PizzaKanbanGameWeb.Board.PantrySlotWidget do
   end
 
   def handle_event("inc", _, socket) do
-    Logger.info("INC")
     game_id = socket.assigns.game_id
     GameStore.get(game_id) |> inc_slot(socket)
   end
@@ -46,7 +45,7 @@ defmodule PizzaKanbanGameWeb.Board.PantrySlotWidget do
 
   defp inc_slot(_, socket), do: {:noreply, socket}
 
-  defp slot_replaced({:ok, pantry}, game, slot, socket) do
+  defp slot_replaced({:ok, pantry, _}, game, slot, socket) do
     game = %Game{game | pantry: pantry}
     GameStore.save(game) |> update_slot(slot, socket)
   end
@@ -55,7 +54,7 @@ defmodule PizzaKanbanGameWeb.Board.PantrySlotWidget do
 
   defp update_slot({:ok, game}, slot, socket) do
     send_update(__MODULE__, id: socket.assigns.id, slot: slot)
-    Kitchen.broad_cast(game, :update_pantry)
+    KitchenWidget.broad_cast(game, :update_pantry)
     {:noreply, socket}
   end
 
