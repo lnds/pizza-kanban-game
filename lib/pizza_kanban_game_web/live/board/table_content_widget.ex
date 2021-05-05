@@ -1,11 +1,12 @@
 defmodule PizzaKanbanGameWeb.Board.TableContentWidget do
-  use Surface.Component
+  use Surface.LiveComponent
 
   alias PizzaKanbanGame.Models.{Ingredient, Pizza}
   alias PizzaKanbanGameWeb.Board.{IngredientWidget, PizzaWidget}
 
   prop table, :struct, required: true
 
+  require Logger
 
   def render(assigns) do
     ~H"""
@@ -49,5 +50,11 @@ defmodule PizzaKanbanGameWeb.Board.TableContentWidget do
   defp after_content(assigns, _) do
     ~H"""
     """
+  end
+
+
+  def handle_event("cook", _, socket) do
+    Logger.info("cook")
+    {:noreply, socket}
   end
 end
