@@ -11,15 +11,9 @@ defmodule PizzaKanbanGameWeb.Board.TableWidget do
 
   def render(assigns) do
     ~H"""
-      <div class="group flex flex-col py-8 px-8 max-w-sm mx-auto bg-white rounded-xl shadow-md space-y-2 sm:py-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-6">
-        <div class="relative w-auto z-auto py-14 px-14 border m-1 p-1 mx-4" phx-hook="Crust" phx-value-name="{{@table.id}}" id="crust-{{@table.id}}" draggable="true">
-            <TableContentWidget table={{@table}} />
-        </div>
-        <button
-          :on-click="cook"
-          class={{"invisible px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2"}}>
-          Hornear
-        </button>
+      <div class="group flex flex-col py-4 px-4
+                 max-w-sm mx-auto bg-white rounded-xl shadow-md space-y-1 sm:py-2 sm:flex sm:items-center sm:space-y-0 sm:space-x-6">
+        <TableContentWidget table={{@table}} />
       </div>
     """
   end
