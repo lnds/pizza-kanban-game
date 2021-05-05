@@ -6,6 +6,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   alias PizzaKanbanGame.PlayerStore
   alias PizzaKanbanGame.Game
   alias PizzaKanbanGame.GameStore
+  alias PizzaKanbanGame.Models.Oven
 
   require Logger
 
@@ -52,6 +53,38 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
     else
       {:noreply, socket}
     end
+  end
+
+  def handle_info(:oven_clock_start, socket) do
+    oven = socket.assigns.game.oven
+    oven = Oven.turn_on(oven)
+    game = %Game{socket.assigns.game| oven: oven}
+    GameStore.save(game)
+    :timer.send_after(1000, self(), :oven_tick)
+    {:noreply, assign(socket, :game, game)}
+  end
+
+  def handle_info(:oven_tick, socket) do
+    oven = socket.assigns.game.oven
+    if oven.on do
+      oven = %Oven{oven| clock: oven.clock + 1}
+      game = %Game{socket.assigns.game| oven: oven}
+      OvenWidget.refresh(game)
+      GameStore.save(game)
+      :timer.send_after(1000, self(), :oven_tick)
+      {:noreply, assign(socket, :game, game)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_info(:oven_clock_stop, socket) do
+    oven = socket.assigns.game.oven
+    oven = Oven.turn_off(oven)
+    game = %Game{socket.assigns.game| oven: oven}
+    OvenWidget.refresh(game)
+    GameStore.save(game)
+    {:noreply, assign(socket, :game, game)}
   end
 
   def refresh(game) do

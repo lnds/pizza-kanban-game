@@ -7,7 +7,8 @@ defmodule PizzaKanbanGame.Models.Oven do
   defstruct id: "oven",
             plates: [],
             limit: 0,
-            clock: 0
+            clock: 0,
+            on: false
 
   @type t() :: %__MODULE__{}
 
@@ -30,6 +31,16 @@ defmodule PizzaKanbanGame.Models.Oven do
     Logger.info("!!por alla #{inspect(pizza)}")
 
     {:error, oven}
+  end
+
+  @spec turn_on(PizzaKanbanGame.Models.Oven.t()) :: PizzaKanbanGame.Models.Oven.t()
+  def turn_on(oven) do
+    %Oven{oven | on: true, clock: 0}
+  end
+
+  @spec turn_off(PizzaKanbanGame.Models.Oven.t()) :: PizzaKanbanGame.Models.Oven.t()
+  def turn_off(oven) do
+    %Oven{oven | on: false, clock: 0}
   end
 
 end

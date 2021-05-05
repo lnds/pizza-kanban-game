@@ -40,7 +40,12 @@ defmodule PizzaKanbanGameWeb.Board.OvenWidget do
   end
 
   def refresh(game) do
-    send_update(__MODULE__, id: "oven", oven: game.oven, game: game)
+    color = case game.oven.clock do
+      clock when clock <= 30 -> "text-blue-100"
+      clock when clock < 40 -> "text-red-400"
+      _ -> "text-red-600"
+    end
+    send_update(__MODULE__, id: "oven", oven: game.oven, game: game, clock_color: color)
   end
 
   def show_clock(nil) do
@@ -62,23 +67,6 @@ defmodule PizzaKanbanGameWeb.Board.OvenWidget do
   def handle_event("stop", _, socket) do
     send(self(), :oven_clock_stop)
     {:noreply, socket}
-  end
-
-  def tick(seconds, continue) do
-    if seconds < 0 do
-      send_update(__MODULE__, id: "oven", clock: 0)
-    else
-      send_update(__MODULE__, id: "oven", clock: seconds)
-    end
-    if seconds <= 30 do
-      send_update(__MODULE__, id: "oven", clock_color: "text-blue-100")
-    else  if seconds > 30 && seconds < 40 do
-      send_update(__MODULE__, id: "oven", clock_color: "text-red-400")
-    else
-      send_update(__MODULE__, id: "oven", clock_color: "text-red-600")
-    end
-  end
-    if continue, do: :timer.send_after(1000, self(), :oven_tick)
   end
 
 end
