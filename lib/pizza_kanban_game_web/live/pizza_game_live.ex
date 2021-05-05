@@ -44,26 +44,21 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   end
 
   @impl true
-  def handle_info({:update_kitchen, game, _}, socket) do
+  def handle_info({:update, game, _}, socket) do
     game_id = socket.assigns.game.id
     if game.id == game_id do
-      {:ok, game} = GameStore.get(game.id)
-      KitchenWidget.refresh(game)
+      refresh(game)
       {:noreply, assign(socket, :game, game)}
     else
       {:noreply, socket}
     end
   end
 
-  def handle_info({:update_pantry, game, _}, socket) do
-    game_id = socket.assigns.game.id
-    if game.id == game_id do
-      {:ok, game} = GameStore.get(game.id)
-      PantryWidget.refresh(game)
-      {:noreply, assign(socket, :game, game)}
-    else
-      {:noreply, socket}
-    end
+  def refresh(game) do
+    PantryWidget.refresh(game)
+    KitchenWidget.refresh(game)
+    OvenWidget.refresh(game)
+    game
   end
 
   defp create_game({:error, _reason}, game_id) do
@@ -74,10 +69,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   end
 
   defp create_game({:ok, game}, _game_id) do
-    PantryWidget.refresh(game)
-    KitchenWidget.refresh(game)
-    OvenWidget.refresh(game)
-    game
+    refresh(game)
   end
 
 

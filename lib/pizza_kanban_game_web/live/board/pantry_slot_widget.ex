@@ -55,7 +55,7 @@ defmodule PizzaKanbanGameWeb.Board.PantrySlotWidget do
 
   defp update_slot({:ok, game}, slot, socket) do
     send_update(__MODULE__, id: socket.assigns.id, slot: slot)
-    KitchenWidget.broad_cast(game, :update_pantry)
+    KitchenWidget.save(game)
     {:noreply, assign(socket, :game, game)}
   end
 

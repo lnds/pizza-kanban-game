@@ -36,7 +36,8 @@ defmodule PizzaKanbanGame.Game do
       name: name,
       players: [player],
       pantry: Pantry.new(),
-      kitchen: Kitchen.new(@default_table_count)
+      kitchen: Kitchen.new(@default_table_count),
+      oven: Oven.new(@default_oven_slots)
     }
 
 
@@ -49,6 +50,7 @@ defmodule PizzaKanbanGame.Game do
 
   def broadcast({:ok, game}, topic, event, data) do
     Phoenix.PubSub.broadcast(PizzaKanbanGame.PubSub, topic, {event, game, data})
+    {:ok, game}
   end
 
 end

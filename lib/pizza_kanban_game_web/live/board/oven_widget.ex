@@ -39,8 +39,8 @@ defmodule PizzaKanbanGameWeb.Board.OvenWidget do
     """
   end
 
-  def refresh(oven) do
-    send_update(__MODULE__, id: "oven", oven: oven)
+  def refresh(game) do
+    send_update(__MODULE__, id: "oven", oven: game.oven, game: game)
   end
 
   def show_clock(nil) do

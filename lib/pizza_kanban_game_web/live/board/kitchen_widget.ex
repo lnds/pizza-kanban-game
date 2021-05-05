@@ -23,6 +23,15 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
     {:ok, socket}
   end
 
+  def broadcast(game) do
+    Game.broadcast({:ok, game}, @topic, :update, nil)
+  end
+
+  def save(game) do
+    GameStore.save(game) |> Game.broadcast(@topic, :update, nil)
+  end
+
+
   def render(assigns) do
     ~H"""
       <div id="kitchen" class="flex-1 flex flex-col bg-gray-700 overflow-hidden">
@@ -41,7 +50,7 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
           <!-- end header -->
         </div>
         <div class="flex flex-wrap justify-center gap-4">
-            <TableWidget :for={{ table <- @tables }}  table={{table}} />
+            <TableWidget :for={{ table <- @tables }}  table={{table}} game={{@game}} />
         </div>
       </div>
     """
@@ -54,12 +63,8 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
   end
 
 
-  def broad_cast(game, :update_pantry) do
-    Game.broadcast({:ok, game}, @topic, :update_pantry, nil)
-  end
-
   def refresh(game) do
-    send_update(__MODULE__, id: "kitchen", tables: game.kitchen.tables)
+    send_update(__MODULE__, id: "kitchen", tables: game.kitchen.tables, game: game)
   end
 
   # do the drop topping stuff
@@ -88,8 +93,9 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
     game = %Game{game | pantry: pantry, kitchen: Kitchen.update_table(game.kitchen, table)}
     PantryWidget.refresh(game)
     refresh(game)
-    GameStore.save(game)
-    Game.broadcast({:ok, game}, @topic, :update_pantry, nil)
+    game
+      |> GameStore.save()
+      |> Game.broadcast(@topic, :update, nil)
     {:noreply, assign(socket, :game, game) }
   end
 
@@ -97,9 +103,7 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
 
   defp validate_move({:ok, kitchen}, socket, game) do
     refresh(game)
-    %Game{game| kitchen: kitchen}
-    |> GameStore.save()
-    |> Game.broadcast(@topic, :update_kitchen, nil)
+    %Game{game| kitchen: kitchen} |> save()
     {:noreply, assign(socket, :game, game)}
   end
 
