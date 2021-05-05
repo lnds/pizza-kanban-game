@@ -29,7 +29,7 @@ defmodule PizzaKanbanGame.Models.Pantry do
   @spec new :: PizzaKanbanGame.Models.Pantry.t()
   def new(),
     do: %Pantry {
-      id: Utils.id(),
+      id: "pantry",
       slots: [
         PantrySlot.new(@crust, @default_quantity),
         PantrySlot.new(@sauce, @default_quantity),
