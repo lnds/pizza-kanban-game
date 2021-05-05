@@ -20,7 +20,7 @@ defmodule PizzaKanbanGame.Models.Pizza do
       ingredients: [ingredient],
     }
 
-  def new(_), do: nil
+  def new(ingredient), do: ingredient
 
   def add_ingredient(pizza, ingredient) do
     Logger.info("ADD ingredient #{inspect(ingredient)} to pizza #{inspect(pizza)}")

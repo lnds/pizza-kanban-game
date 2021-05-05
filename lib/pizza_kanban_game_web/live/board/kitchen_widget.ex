@@ -41,7 +41,7 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
           <!-- end header -->
         </div>
         <div class="flex flex-wrap justify-center gap-4">
-            <TableWidget :for={{ table <- @tables }} id="{{table.id}}" table={{table}} game_id="{{@game_id}}" />
+            <TableWidget :for={{ table <- @tables }}  table={{table}} game_id="{{@game_id}}" />
         </div>
       </div>
     """

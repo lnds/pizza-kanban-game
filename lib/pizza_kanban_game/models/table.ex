@@ -47,7 +47,7 @@ defmodule PizzaKanbanGame.Models.Table do
     ingredients = List.delete(ingredients, ingredient)
     case length(ingredients)  do
       0 -> {:ok, %Table{table| content: nil}}
-      1 -> {:ok, %Table{table| content: List.first(ingredients)}}
+      1 -> {:ok, %Table{table| content: Pizza.new(List.first(ingredients))}}
       _ -> {:ok, %Table{table| content: %Pizza{table.content | ingredients: ingredients}}}
     end
   end
