@@ -36,9 +36,11 @@ defmodule PizzaKanbanGame.Models.Pizza do
     %Pizza{pizza| cook_time: seconds }
   end
 
-  def is_burned(pizza), do: Oven.get_burning_state(pizza.cook_time) == :burned
+  @spec burned?(Pizza.t()) :: boolean
+  def burned?(pizza), do: Oven.get_burning_state(pizza.cook_time) == :burned
 
-  def is_raw(pizza), do: !Pizza.is_burned(pizza)
+  @spec raw?(PizzaKanbanGame.Models.Pizza.t()) :: boolean
+  def raw?(pizza), do: !Pizza.burned?(pizza)
 
 
 end
