@@ -12,6 +12,10 @@ defmodule PizzaKanbanGame.Models.Oven do
 
   @type t() :: %__MODULE__{}
 
+  @raw_time 30
+
+  @burn_time 35
+
   alias PizzaKanbanGame.Models.{Oven, Plate, Pizza}
 
   @spec new(integer) :: PizzaKanbanGame.Models.Oven.t()
@@ -22,16 +26,10 @@ defmodule PizzaKanbanGame.Models.Oven do
 
   @spec put_pizza(Oven.t(), Pizza.t()) :: {:ok, Oven.t()} | {:error, Oven.t()}
   def put_pizza(oven, %Pizza{ingredients: _}=pizza) when length(oven.plates) < oven.limit do
-      Logger.info("!!por aca #{inspect(pizza)}")
-
-      {:ok, %Oven{oven| plates: [Plate.new(pizza) | oven.plates]} }
+      {:ok, %Oven{oven| plates: oven.plates ++ [Plate.new(pizza, oven.clock)]} }
   end
 
-  def put_pizza(oven, pizza) do
-    Logger.info("!!por alla #{inspect(pizza)}")
-
-    {:error, oven}
-  end
+  def put_pizza(oven, _pizza), do:  {:error, oven}
 
   @spec turn_on(PizzaKanbanGame.Models.Oven.t()) :: PizzaKanbanGame.Models.Oven.t()
   def turn_on(oven) do
@@ -46,4 +44,14 @@ defmodule PizzaKanbanGame.Models.Oven do
   def remove_plates(oven) do
     {%Oven{oven| plates: []}, oven.plates}
   end
+
+
+  def get_burning_state(clock) do
+     cond do
+      clock <= @raw_time -> :cooking
+      clock <= @burn_time -> :heating
+      true -> :burned
+    end
+  end
+
 end

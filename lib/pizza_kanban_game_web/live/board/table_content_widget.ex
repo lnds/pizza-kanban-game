@@ -66,12 +66,10 @@ defmodule PizzaKanbanGameWeb.Board.TableContentWidget do
 
   defp put_pizza_in_oven(%Pizza{id: _}=pizza, table, socket) do
     game = socket.assigns.game
-    Logger.info("PUT PIZZA IN OVEN table=#{inspect(table)}\n pizza=#{inspect(pizza)}\n oven=#{inspect(game.oven)}")
     Oven.put_pizza(game.oven, pizza) |> validate_pizza_in_oven(game, table, socket)
   end
 
   defp validate_pizza_in_oven({:ok, oven}, game, table, socket) do
-    Logger.info("validate pizza in oven: #{inspect(oven)}")
     table = %Table{table | content: nil }
     game = %Game{game | kitchen: Kitchen.update_table(game.kitchen, table), oven: oven }
     OvenWidget.refresh(game)

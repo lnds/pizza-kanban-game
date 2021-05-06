@@ -42,9 +42,10 @@ defmodule PizzaKanbanGameWeb.Board.OvenWidget do
   end
 
   def refresh(game) do
-    color = case game.oven.clock do
-      clock when clock <= 30 -> "text-blue-100"
-      clock when clock < 40 -> "text-red-400"
+    state = Oven.get_burning_state(game.oven.clock)
+    color = case state do
+      :cooking -> "text-blue-100"
+      :heating -> "text-red-400"
       _ -> "text-red-600"
     end
     plates = Enum.map(game.oven.plates, &Plate.cook(&1, game.oven.clock))
