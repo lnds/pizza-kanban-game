@@ -37,9 +37,9 @@ defmodule PizzaKanbanGameWeb.Board.TableContentWidget do
   end
 
 
-  defp after_content(assigns, %Pizza{id: _}=_pizza) do
+  defp after_content(assigns, %Pizza{id: _}=pizza) do
     ~H"""
-      <button
+      <button :if={{Oven.accepts(assigns.game.oven, pizza)}}
       :on-click="cook"
       class={{"visible px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200
       hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-1 focus:ring-purple-600 focus:ring-offset-1"}}>

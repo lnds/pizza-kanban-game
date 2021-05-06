@@ -17,7 +17,8 @@ defmodule PizzaKanbanGameWeb.Board.OvenWidget do
           <!-- header -->
           <div class="flex flex-col max-w">
             <h3 class="text-white mb-1 font-bold text-xl text-gray-100 flex flex-row max-w">
-              Horno  <span class={{ "mx-4", @clock_color,  "mx-4 px-2 border flat-right " }}>{{show_clock(@game.oven)}}</span>
+              Horno  <span class={{ "mx-4", @clock_color,  "mx-4 px-2 border flat-right " }}>{{show_clock(@oven)}}</span>
+                     <span  class="mx-4 bg-blue-600 rounded border-gray-500" :if={{@oven}}>&nbsp;{{@oven.limit}}&nbsp;</span>
             </h3>
           </div>
         </div>

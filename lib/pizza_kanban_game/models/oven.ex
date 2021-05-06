@@ -25,11 +25,13 @@ defmodule PizzaKanbanGame.Models.Oven do
     }
 
   @spec put_pizza(Oven.t(), Pizza.t()) :: {:ok, Oven.t()} | {:error, Oven.t()}
-  def put_pizza(oven, %Pizza{ingredients: _}=pizza) when length(oven.plates) < oven.limit do
+  def put_pizza(%Oven{on: false}=oven, %Pizza{ingredients: _}=pizza) when length(oven.plates) < oven.limit do
       {:ok, %Oven{oven| plates: oven.plates ++ [Plate.new(pizza, oven.clock)]} }
   end
 
   def put_pizza(oven, _pizza), do:  {:error, oven}
+
+  def accepts(oven, _pizza), do: !oven.on && length(oven.plates) < oven.limit
 
   @spec turn_on(PizzaKanbanGame.Models.Oven.t()) :: PizzaKanbanGame.Models.Oven.t()
   def turn_on(oven) do
