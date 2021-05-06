@@ -20,27 +20,32 @@ defmodule PizzaKanbanGame.Models.Pantry do
   @tomato %Ingredient{id: "tomato", display_name: "tomate", image: "tomatoes.png", cost: 10, order: 16, kind: :topping}
   @green_peppers %Ingredient{id: "green_peppers", display_name: "pimentón", image: "green_peppers.png", cost: 10, order: 32, kind: :topping}
   @pineapple %Ingredient{id: "pineapple", display_name: "piña", image: "pineapples.png", cost: 15, order: 64, kind: :topping}
+
   @anchovies %Ingredient{id: "anchovies", display_name: "anchoas", image: "anchovies.png", cost: 15, order: 128, kind: :topping}
 
-
-
   @default_quantity 10
+
+  @default_ingredients  [
+    @crust,
+    @sauce,
+    @cheese,
+    @salami,
+    @pepperoni,
+    @tomato,
+    @green_peppers,
+    @pineapple,
+    @anchovies,
+  ]
+
+  @default_slots  Enum.map(@default_ingredients, &PantrySlot.new(&1, @default_quantity))
+
+
 
   @spec new :: PizzaKanbanGame.Models.Pantry.t()
   def new(),
     do: %Pantry {
       id: "pantry",
-      slots: [
-        PantrySlot.new(@crust, @default_quantity),
-        PantrySlot.new(@sauce, @default_quantity),
-        PantrySlot.new(@cheese, @default_quantity),
-        PantrySlot.new(@salami, @default_quantity),
-        PantrySlot.new(@pepperoni, @default_quantity),
-        PantrySlot.new(@tomato, @default_quantity),
-        PantrySlot.new(@green_peppers, @default_quantity),
-        PantrySlot.new(@pineapple, @default_quantity),
-        PantrySlot.new(@anchovies, @default_quantity),
-      ]
+      slots: @default_slots
     }
 
   def get_ingredient_by_id(pantry, id) do
@@ -50,6 +55,10 @@ defmodule PizzaKanbanGame.Models.Pantry do
     else
       nil
     end
+  end
+
+  def get_ingredients(kind) do
+    Enum.filter(@default_ingredients, &(&1.kind == kind))
   end
 
   def replace_slot(pantry, new_slot) do

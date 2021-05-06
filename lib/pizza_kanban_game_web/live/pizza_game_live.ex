@@ -2,7 +2,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   use Surface.LiveView
 
   alias PizzaKanbanGameWeb.Router.Helpers, as: Routes
-  alias PizzaKanbanGameWeb.Board.{PantryWidget, KitchenWidget, OvenWidget}
+  alias PizzaKanbanGameWeb.Board.{PantryWidget, KitchenWidget, OvenWidget, OrdersWidget}
   alias PizzaKanbanGame.PlayerStore
   alias PizzaKanbanGame.Game
   alias PizzaKanbanGame.GameStore
@@ -26,7 +26,8 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
         <%= live_component @socket, PantryWidget, id: "pantry", game: @game %>
         <%= live_component @socket, KitchenWidget, id: "kitchen", game: @game %>
         <%= live_component @socket, OvenWidget, id: "oven", game: @game %>
-      </main>
+        <%= live_component @socket, OrdersWidget, id: "orders", game: @game %>
+        </main>
     """
   end
 
