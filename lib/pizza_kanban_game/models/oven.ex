@@ -50,7 +50,8 @@ defmodule PizzaKanbanGame.Models.Oven do
 
   def get_burning_state(clock) do
      cond do
-      clock <= @raw_time -> :cooking
+      clock == 0 -> :dropped
+      clock < @raw_time -> :cooking
       clock <= @burn_time -> :heating
       true -> :burned
     end

@@ -43,7 +43,6 @@ defmodule PizzaKanbanGameWeb.Board.OrdersWidget do
   defp display_base(_, base), do: "sin #{base.display_name},"
 
   defp display_topping(topping, index, toppings) do
-    Logger.info("index = #{index} length = #{length(toppings)}")
     if index < length(toppings)-1 do
       "#{topping.display_name},"
     else
