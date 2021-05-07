@@ -6,7 +6,8 @@ defmodule PizzaKanbanGame.Models.Order do
 
   defstruct id: 0,
             bases: [],
-            toppings: []
+            toppings: [],
+            done: false
 
   @type t() :: %__MODULE__{}
 

@@ -13,28 +13,30 @@ defmodule PizzaKanbanGameWeb.Board.OvenWidget do
   def render(assigns) do
     ~H"""
       <div class="bg-gray-800 text-purple-lighter flex-none w-64 pb-6 md:block">
-        <div class="border-b border-gray-600 flex px-6 py-2 items-center flex-none shadow-xl">
+        <div class="border-gray-600 flex px-6 py-2 items-center flex-none shadow-xl">
           <!-- header -->
           <div class="flex flex-col max-w">
             <h3 class="text-white mb-1 font-bold text-xl text-gray-100 flex flex-row max-w">
-              Horno  <span class={{ "mx-4", @clock_color,  "mx-4 px-2 border flat-right " }}>{{show_clock(@oven)}}</span>
-                     <span  class="mx-4 bg-blue-600 rounded border-gray-500" :if={{@oven}}>&nbsp;{{@oven.limit}}&nbsp;</span>
+              Horno
+              <span class={{ "mx-4", @clock_color,  "mx-4 px-2 border flat-right " }}>{{show_clock(@oven)}}</span>
+              <span  class="mx-4 bg-blue-600 rounded border-gray-500" :if={{@oven}}>&nbsp;{{@oven.limit}}&nbsp;</span>
             </h3>
+            <div class="border-gray-600 m-4 grid place-items-center">
+              <button :if={{@oven && !@oven.on}}
+                :on-click="start"
+                class={{ "align-center px-4 py-1 text-sm text-white font-semibold rounded-full border border-purple-200 hover:text-white bg-red-800 hover:bg-red-600 hover:border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2"}}>
+                encender
+              </button>
+              <button :if={{@oven && @oven.on}}
+                :on-click="stop"
+                class={{ "px-4 py-1 text-sm text-white font-semibold rounded-full border border-purple-200 hover:text-white bg-blue-800 hover:bg-blue-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2"}}>
+                apagar
+              </button>
+            </div>
           </div>
         </div>
         <!-- end header -->
-        <div class="border-gray-600 m-4 grid place-items-center">
-          <button :if={{@oven && !@oven.on}}
-            :on-click="start"
-            class={{ "align-center px-4 py-1 text-sm text-white font-semibold rounded-full border border-purple-200 hover:text-white bg-red-800 hover:bg-red-600 hover:border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2"}}>
-            encender
-          </button>
-          <button :if={{@oven && @oven.on}}
-            :on-click="stop"
-            class={{ "px-4 py-1 text-sm text-white font-semibold rounded-full border border-purple-200 hover:text-white bg-blue-800 hover:bg-blue-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2"}}>
-            apagar
-          </button>
-        </div>
+
         <div :if={{@oven}} class="flex flex-wrap justify-center gap-4">
             <PlateWidget  :for={{ plate <- @oven.plates }} plate={{plate}} />
         </div>

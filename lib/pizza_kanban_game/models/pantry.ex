@@ -23,7 +23,7 @@ defmodule PizzaKanbanGame.Models.Pantry do
 
   @anchovies %Ingredient{id: "anchovies", display_name: "anchoas", image: "anchovies.png", cost: 15, order: 128, kind: :topping}
 
-  @default_quantity 10
+  @default_quantity 0
 
   @default_ingredients  [
     @crust,
@@ -78,12 +78,12 @@ defmodule PizzaKanbanGame.Models.Pantry do
   def add_ingredient(pantry, ing, q) do
     get_and_update_in(pantry.slots,
       [Access.filter(fn slot -> Utils.string_equals?(slot.ingredient.id, ing) end)],
-      fn slot -> {slot, %PantrySlot{slot| quantity: slot.quantity+q}} end
+      fn slot -> {slot, %PantrySlot{slot| quantity: slot.quantity + q}} end
     ) |> validate_slot_change(pantry)
   end
 
 
-  defp validate_slot_change({[changed_slot|_], slots}, pantry) when changed_slot.quantity > 0 do
+  defp validate_slot_change({[changed_slot|_], slots}, pantry) when changed_slot.quantity >= 0 do
     {:ok,  %Pantry{pantry | slots: slots}, changed_slot}
   end
 

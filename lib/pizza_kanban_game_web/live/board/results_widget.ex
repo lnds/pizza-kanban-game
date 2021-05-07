@@ -1,25 +1,24 @@
-defmodule PizzaKanbanGameWeb.Board.OrdersWidget do
+defmodule PizzaKanbanGameWeb.Board.ResultsWidget do
   use Surface.LiveComponent
 
   require Logger
-  alias PizzaKanbanGameWeb.Board.{KitchenWidget, PlateWidget, OrdersBoardWidget}
+  alias PizzaKanbanGameWeb.Board.{OrderBoardWidget, PlateWidget}
   alias PizzaKanbanGame.Game
   alias PizzaKanbanGame.Models.Order
 
   prop game, :struct, default: nil
 
-
   def render(assigns) do
     ~H"""
-      <div class="bg-gray-400 text-purple-lighter flex-none w-64 pb-6 md:block">
-        <div class="border-b border-gray-400 flex px-6 py-2 items-center flex-none shadow-xl">
+      <div class="bg-gray-600 text-purple-lighter flex-none w-64 pb-6 md:block">
+        <div class="border-b border-gray-600 flex px-6 py-2 items-center flex-none shadow-xl">
           <!-- header -->
           <div class="flex flex-col max-w">
             <h3 class="text-white mb-1 font-bold text-xl text-gray-100 flex flex-row max-w">
-              Ordenes
+              Resultados
             </h3>
-            <OrdersBoardWidget game={{@game}} />
-            </div>
+          </div>
+          <!-- end header -->
         </div>
       </div>
     """

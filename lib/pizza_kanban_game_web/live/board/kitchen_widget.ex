@@ -35,7 +35,7 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
   def render(assigns) do
     ~H"""
       <div id="kitchen" class="flex-1 flex flex-col bg-gray-700 overflow-hidden">
-        <div class="border-b border-gray-600 flex px-6 py-2 items-center flex-none shadow-xl">
+        <div class="border-gray-600 flex px-6 py-2 items-center flex-none shadow-xl">
           <!-- header -->
           <div class="flex flex-col">
             <h3 class="text-white mb-1 font-bold text-xl text-gray-100 flex flex-inline">
@@ -49,7 +49,7 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
           </div>
           <!-- end header -->
         </div>
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid grid-cols-3 gap-4 m-4">
         <TableWidget :for={{ table <- @tables }}  table={{table}} game={{@game}} />
         </div>
       </div>
