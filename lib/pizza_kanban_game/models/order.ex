@@ -5,10 +5,10 @@ defmodule PizzaKanbanGame.Models.Order do
   require Logger
 
   defstruct id: 0,
-            bases: [],
-            toppings: [],
+            cook_time: 0,
             done: false,
-            cook_time: 0
+            bases: [],
+            toppings: []
 
   @type t() :: %__MODULE__{}
 
@@ -27,6 +27,14 @@ defmodule PizzaKanbanGame.Models.Order do
     }
 
 
+  def unsolicited_from_pizza(pizza),
+    do: %Order {
+      id: 0,
+      bases: Enum.filter(pizza.ingredients, &(&1.kind == :base)) |> Enum.map(&({true, &1})),
+      toppings: Enum.filter(pizza.ingredients, &(&1.kind == :topping)),
+      done: true
+    }
+
   defp toss_coin() do
     Enum.random([false, true])
   end
@@ -36,15 +44,12 @@ defmodule PizzaKanbanGame.Models.Order do
     Enum.map(1 .. n, fn i -> Order.new(base + i) end)
   end
 
-  def check_done_orders(orders, pizzas) do
-    {orders, _} = check_pizzas(orders, pizzas)
-    orders
-  end
+  def check_done_orders(orders, pizzas), do: check_pizzas(orders, pizzas)
 
   defp check_pizzas([], pizzas), do: {[], pizzas}
 
   defp check_pizzas([order], pizzas) do
-    if pizza = Enum.find(pizzas, fn pizza -> Pizza.match_ingredients(pizza, Enum.map(order.bases, fn {_, ing} -> ing end) ++ order.toppings) end) do
+    if pizza = Enum.find(pizzas, fn pizza -> Pizza.match_ingredients(pizza, filter_bases(order.bases) ++ order.toppings) end) do
       { [%Order{order| done: true}], pizzas -- [pizza] }
     else
       { [order], pizzas }
@@ -57,4 +62,7 @@ defmodule PizzaKanbanGame.Models.Order do
     {new_head ++ new_tail, pizzas}
   end
 
+  defp filter_bases(bases) do
+    Enum.filter(bases, fn {m, _} -> m end) |> Enum.map(fn {_, ing} -> ing end)
+  end
 end

@@ -45,9 +45,12 @@ defmodule PizzaKanbanGame.Game do
     {:ok}
   end
 
+  @spec verifiy_plates(PizzaKanbanGame.Game.t(), any) :: PizzaKanbanGame.Game.t()
   def verifiy_plates(game, plates) do
     pizzas = Enum.map(plates, fn plate -> plate.pizza end)
-    new_orders = Order.check_done_orders(game.orders, pizzas)
+    {new_orders, left_pizzas} = Order.check_done_orders(game.orders, pizzas)
+    Logger.info("new_orders: #{inspect(new_orders)}")
+    Logger.info("left_pizzas: #{inspect(left_pizzas)}")
     %Game{game | orders: new_orders}
   end
 
