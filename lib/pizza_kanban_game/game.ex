@@ -16,6 +16,8 @@ defmodule PizzaKanbanGame.Game do
   @default_oven_slots 2
   @default_order_quantity 20
 
+  require Logger
+
   @spec new(String.t(), PizzaKanbanGame.Player.t()) :: PizzaKanbanGame.Game.t()
   def new(name, player), do: new_with_id(Utils.id(), name, player)
 
@@ -41,6 +43,12 @@ defmodule PizzaKanbanGame.Game do
   def broadcast({:ok, game}, topic, event, data) do
     Phoenix.PubSub.broadcast(PizzaKanbanGame.PubSub, topic, {event, game, data})
     {:ok}
+  end
+
+  def verifiy_plates(game, plates) do
+    pizzas = Enum.map(plates, fn plate -> plate.pizza end)
+    new_orders = Order.check_done_orders(game.orders, pizzas)
+    %Game{game | orders: new_orders}
   end
 
 end

@@ -32,6 +32,11 @@ defmodule PizzaKanbanGame.Models.Pizza do
     end
   end
 
+  def match_ingredients(pizza, ingredients) do
+    i1 = Enum.filter(pizza.ingredients, &(&1.kind != :crust)) |>  Enum.sort(&(&1.order <= &2.order))
+    i2 = ingredients |> Enum.sort(&(&1.order <= &2.order))
+    i1 == i2
+  end
   def cook(pizza, seconds) do
     %Pizza{pizza| cook_time: seconds }
   end

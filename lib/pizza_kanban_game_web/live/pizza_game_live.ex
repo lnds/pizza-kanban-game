@@ -27,7 +27,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
         <%= live_component @socket, KitchenWidget, id: "kitchen", game: @game %>
         <%= live_component @socket, OvenWidget, id: "oven", game: @game %>
         <%= live_component @socket, OrdersWidget, id: "orders", game: @game %>
-        <%= live_component @socket, ResultsWidget, id: "orders", game: @game %>
+        <%= live_component @socket, ResultsWidget, id: "results", game: @game %>
         </main>
     """
   end
@@ -80,10 +80,10 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   end
 
   def handle_info(:oven_clock_stop, socket) do
-    {oven, _plates} = Oven.turn_off(socket.assigns.game.oven) |> Oven.remove_plates()
-    game = %Game{socket.assigns.game| oven: oven}
+    {oven, plates} = Oven.turn_off(socket.assigns.game.oven) |> Oven.remove_plates()
+    game = %Game{socket.assigns.game| oven: oven} |> Game.verifiy_plates(plates)
     OvenWidget.refresh(game)
-    GameStore.save(game)
+    KitchenWidget.save(game)
     {:noreply, assign(socket, :game, game)}
   end
 
@@ -91,6 +91,8 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
     PantryWidget.refresh(game)
     KitchenWidget.refresh(game)
     OvenWidget.refresh(game)
+    OrdersWidget.refresh(game)
+    ResultsWidget.refresh(game)
     game
   end
 
