@@ -69,7 +69,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   def handle_info(:oven_tick, socket) do
     oven = socket.assigns.game.oven
     if oven.on do
-      oven = %Oven{oven| clock: oven.clock + 1}
+      oven = Oven.cook(oven)
       game = %Game{socket.assigns.game| oven: oven}
       KitchenWidget.save(game)
       :timer.send_after(1000, self(), :oven_tick)

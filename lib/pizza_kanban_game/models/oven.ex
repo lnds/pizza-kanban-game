@@ -40,11 +40,16 @@ defmodule PizzaKanbanGame.Models.Oven do
 
   @spec turn_off(PizzaKanbanGame.Models.Oven.t()) :: PizzaKanbanGame.Models.Oven.t()
   def turn_off(oven) do
-    %Oven{oven | on: false, clock: 0}
+    %Oven{oven | on: false}
   end
 
   def remove_plates(oven) do
     {%Oven{oven| plates: []}, oven.plates}
+  end
+
+  def cook(oven) do
+    new_clock = oven.clock + 1
+    %Oven{oven | clock: new_clock, plates: Enum.map(oven.plates, fn plate -> Plate.cook(plate, new_clock) end)}
   end
 
 

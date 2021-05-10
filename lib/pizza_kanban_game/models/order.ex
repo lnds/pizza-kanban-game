@@ -50,7 +50,7 @@ defmodule PizzaKanbanGame.Models.Order do
 
   defp check_pizzas([order], pizzas) do
     if pizza = Enum.find(pizzas, fn pizza -> Pizza.match_ingredients(pizza, filter_bases(order.bases) ++ order.toppings) end) do
-      { [%Order{order| done: true}], pizzas -- [pizza] }
+      { [%Order{order| done: true, cook_time: pizza.cook_time}], pizzas -- [pizza] }
     else
       { [order], pizzas }
     end

@@ -48,10 +48,11 @@ defmodule PizzaKanbanGame.Game do
   @spec verifiy_plates(PizzaKanbanGame.Game.t(), any) :: PizzaKanbanGame.Game.t()
   def verifiy_plates(game, plates) do
     pizzas = Enum.map(plates, fn plate -> plate.pizza end)
+    Logger.info("pizzas]:\n #{inspect(pizzas)}")
     {new_orders, left_pizzas} = Order.check_done_orders(game.orders, pizzas)
-    Logger.info("new_orders: #{inspect(new_orders)}")
+    unsolicited = Enum.map(left_pizzas, fn pizza -> Order.unsolicited_from_pizza(pizza) end)
     Logger.info("left_pizzas: #{inspect(left_pizzas)}")
-    %Game{game | orders: new_orders}
+    %Game{game | orders: new_orders ++ unsolicited}
   end
 
 end
