@@ -34,7 +34,7 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
 
   def render(assigns) do
     ~H"""
-      <div id="kitchen" class="flex-1 flex flex-col bg-gray-700 overflow-hidden">
+      <div id="kitchen" class="flex-1 flex flex-col bg-gray-700 w-5/12">
         <div class="border-gray-600 flex px-6 py-2 items-center flex-none shadow-xl">
           <!-- header -->
           <div class="flex flex-col">

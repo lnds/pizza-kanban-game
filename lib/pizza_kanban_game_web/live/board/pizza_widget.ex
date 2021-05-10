@@ -14,8 +14,8 @@ defmodule PizzaKanbanGameWeb.Board.PizzaWidget do
     <div  class="{{get_class(@pizza, @table)}}">
       <IngredientWidget :for={{ingredient <- @pizza.ingredients}} ingredient={{ingredient}} table="{{@table}}" />
       <img :if={{Pizza.burned?(@pizza)}}
-      class="absolute top-0 left-0 z-auto "
-      src="{{ Routes.static_path(PizzaKanbanGameWeb.Endpoint, "/images/burn.png") }}" >
+        class="absolute top-0 left-0 z-auto "
+        src="{{ Routes.static_path(PizzaKanbanGameWeb.Endpoint, "/images/burn.png") }}" >
     </div>
     """
   end
