@@ -35,7 +35,6 @@ defmodule PizzaKanbanGame.Models.Pizza do
   def match_ingredients(pizza, ingredients) do
     i1 = Enum.map(pizza.ingredients, fn ing -> ing.order end) |>  Enum.sum()
     i2 = Enum.map(ingredients, fn ing -> ing.order end) |>  Enum.sum()
-    Logger.info("I1 = #{i1}  I2 = #{i2}")
     i1 == i2
   end
   def cook(pizza, seconds) do

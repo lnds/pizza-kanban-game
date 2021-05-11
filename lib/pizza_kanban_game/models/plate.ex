@@ -2,23 +2,20 @@ defmodule PizzaKanbanGame.Models.Plate do
 
   use StructAccess
 
-  defstruct pizza: nil,
-            start_time: 0
+  defstruct pizza: nil
 
   @type t() :: %__MODULE__{}
 
   alias PizzaKanbanGame.Models.{Plate, Pizza}
 
-  @spec new(Pizza.t(), integer) :: PizzaKanbanGame.Models.Plate.t()
-  def new(pizza, start_time),
+  @spec new(Pizza.t()) :: PizzaKanbanGame.Models.Plate.t()
+  def new(pizza),
     do: %Plate {
-      pizza: pizza,
-      start_time: start_time
+      pizza: pizza
     }
 
 
-  def cook(plate, seconds) do
-    elapsed = seconds - plate.start_time
+  def cook(plate, elapsed) do
     %Plate{plate| pizza: Pizza.cook(plate.pizza, elapsed) }
   end
 
