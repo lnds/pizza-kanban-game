@@ -21,7 +21,8 @@ defmodule PizzaKanbanGameWeb.Board.OvenWidget do
               <span class={{ "mx-4", @clock_color,  "mx-2 px-1 border flat-right " }}>{{show_clock(@oven)}}</span>
 
             </h3>
-            <div class="border-gray-600 m-4 grid place-items-center">
+            <div :if={{@game && @game.clock > 0}}
+              class="border-gray-600 m-4 grid place-items-center">
               <button :if={{@oven && !@oven.on}}
                 :on-click="start"
                 class={{ "align-center px-4 py-1 text-sm text-white font-semibold rounded-full border border-purple-200 hover:text-white bg-red-800 hover:bg-red-600 hover:border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2"}}>

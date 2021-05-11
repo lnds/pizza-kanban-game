@@ -5,7 +5,9 @@ defmodule PizzaKanbanGame.Game do
             kitchen: nil,
             pantry: nil,
             oven: nil,
-            orders: []
+            orders: [],
+            score: 0,
+            clock: 0
 
   @type t() :: %__MODULE__{}
 
@@ -51,6 +53,16 @@ defmodule PizzaKanbanGame.Game do
     {new_orders, left_pizzas} = Order.check_done_orders(game.orders, pizzas)
     unsolicited = Enum.map(left_pizzas, fn pizza -> Order.unsolicited_from_pizza(pizza) end)
     %Game{game | orders: new_orders ++ unsolicited}
+  end
+
+  def score(nil), do: 0
+
+  def score(game) do
+    orders_sum = Enum.map(game.orders, fn order -> Order.value(order) end) |> Enum.sum()
+    pantry_sum = Pantry.inventory(game.pantry)
+    Logger.info("orders_sum = #{inspect(orders_sum)}")
+    Logger.info("pantry_sum = #{inspect(pantry_sum)}")
+    orders_sum - pantry_sum
   end
 
 end

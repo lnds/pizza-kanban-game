@@ -14,7 +14,7 @@ defmodule PizzaKanbanGame.Models.Order do
 
   @topping_limit 4
 
-  alias PizzaKanbanGame.Models.{Order, Pantry, Pizza}
+  alias PizzaKanbanGame.Models.{Order, Pantry, Pizza, Oven}
 
   @spec new(integer) :: PizzaKanbanGame.Models.Order.t()
   def new(id),
@@ -26,13 +26,29 @@ defmodule PizzaKanbanGame.Models.Order do
                       |> Enum.take(@topping_limit)
     }
 
+  def value(%Order{done: true}=order) do
+    crust = Pantry.get_crust()
+    bases_cost = filter_bases(order.bases)  |> Enum.map(fn base ->  base.cost end) |> Enum.sum()
+    toppings_cost = Enum.map(order.toppings, fn base -> base.cost end) |> Enum.sum()
+    case Oven.get_burning_state(order) do
+      :heating when order.id > 0-> crust.cost + bases_cost + toppings_cost
+      :heating when order.id <= 0-> -(crust.cost + bases_cost + toppings_cost)
+      _ -> 0 - (crust.cost + bases_cost + toppings_cost)
+    end
+  end
 
+  def value(_), do: 0
+
+
+
+  @spec unsolicited_from_pizza(Pizza.t()) :: PizzaKanbanGame.Models.Order.t()
   def unsolicited_from_pizza(pizza),
     do: %Order {
-      id: 0,
+      id: -1,
       bases: Enum.filter(pizza.ingredients, &(&1.kind == :base)) |> Enum.map(&({true, &1})),
       toppings: Enum.filter(pizza.ingredients, &(&1.kind == :topping)),
-      done: true
+      done: true,
+      cook_time: pizza.cook_time
     }
 
   defp toss_coin() do
@@ -65,4 +81,6 @@ defmodule PizzaKanbanGame.Models.Order do
   defp filter_bases(bases) do
     Enum.filter(bases, fn {m, _} -> m end) |> Enum.map(fn {_, ing} -> ing end)
   end
+
+
 end

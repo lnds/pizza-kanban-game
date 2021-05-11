@@ -14,7 +14,7 @@ defmodule PizzaKanbanGame.Models.Oven do
 
   @raw_time 30
 
-  @burn_time 35
+  @burn_time 45
 
   alias PizzaKanbanGame.Models.{Oven, Plate, Pizza}
 

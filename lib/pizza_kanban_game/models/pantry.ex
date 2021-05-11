@@ -61,6 +61,14 @@ defmodule PizzaKanbanGame.Models.Pantry do
     Enum.filter(@default_ingredients, &(&1.kind == kind))
   end
 
+  def inventory(pantry) do
+    Enum.map(pantry.slots, fn slot -> slot.quantity * slot.ingredient.cost end) |> Enum.sum()
+  end
+
+  def get_crust() do
+    @crust
+  end
+
   def replace_slot(pantry, new_slot) do
     get_and_update_in(pantry.slots,
       [Access.filter(fn slot -> Utils.string_equals?(slot.id, new_slot.id) end)],

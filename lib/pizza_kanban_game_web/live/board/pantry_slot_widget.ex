@@ -21,10 +21,12 @@ defmodule PizzaKanbanGameWeb.Board.PantrySlotWidget do
               id="{{@slot.ingredient.id}}" phx-hook="Topping" class="z-auto w-full"
               data-topping="{{@slot.ingredient.id}}" data-from="pantry">
         </div>
-        <div class="z-auto absolute -top-1 -left-4 text-xs bg-blue-600 w-4 text-center text-white rounded-full ">
+        <div :if={{@game && @game.clock > 0}}
+          class="z-auto absolute -top-1 -left-4 text-xs bg-blue-600 w-4 text-center text-white rounded-full ">
           {{@slot.quantity}}
         </div>
-        <div class="z-auto absolute -top-1 -right-4 text-xs bg-red-600 w-4 text-center text-white rounded-full "
+        <div :if={{@game && @game.clock > 0}}
+          class="z-auto absolute -top-1 -right-4 text-xs bg-red-600 w-4 text-center text-white rounded-full "
               :on-click="inc">
           +
         </div>
