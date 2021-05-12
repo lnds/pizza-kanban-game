@@ -137,10 +137,10 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
       :timer.send_after(1000, self(), :game_tick)
       %Game{game| clock: game.clock - 1}
     else
-      %Game{game| clock: 0, score: Game.score(game)}
-    end
-    if game.oven.on do
+      if game.oven.on do
         send(self(), :oven_clock_stop)
+      end
+      %Game{game| clock: 0, score: game.score + Game.score(game)}
     end
     KitchenWidget.save(game)
     {:noreply, assign(socket, :game, game)}

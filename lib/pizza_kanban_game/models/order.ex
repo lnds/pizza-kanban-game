@@ -30,11 +30,16 @@ defmodule PizzaKanbanGame.Models.Order do
     crust = Pantry.get_crust()
     bases_cost = filter_bases(order.bases)  |> Enum.map(fn base ->  base.cost end) |> Enum.sum()
     toppings_cost = Enum.map(order.toppings, fn base -> base.cost end) |> Enum.sum()
-    case Oven.get_burning_state(order) do
-      :heating when order.id > 0-> crust.cost + bases_cost + toppings_cost
-      :heating when order.id <= 0-> -(crust.cost + bases_cost + toppings_cost)
-      _ -> 0 - (crust.cost + bases_cost + toppings_cost)
+
+    value = case Oven.get_burning_state(order.cook_time) do
+      :heating when order.id > 0 -> crust.cost + bases_cost + toppings_cost
+      :heating when order.id <= 0 -> -(crust.cost + bases_cost + toppings_cost)
+      _ ->  - (crust.cost + bases_cost + toppings_cost)
     end
+    Logger.info("value of order = #{inspect(order)}")
+    Logger.info("is = #{inspect(value)}")
+    Logger.info("burningstate = #{inspect(Oven.get_burning_state(order.cook_time) )}")
+    value
   end
 
   def value(_), do: 0

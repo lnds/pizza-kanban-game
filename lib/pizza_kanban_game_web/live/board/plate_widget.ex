@@ -12,9 +12,6 @@ defmodule PizzaKanbanGameWeb.Board.PlateWidget do
         <div class="relative w-auto z-auto py-14 px-14  m-1 p-1 mx-2 ">
           <PizzaWidget pizza={{@plate.pizza}} />
         </div>
-        <div class="text-red-400">
-          <span>|{{@plate.pizza.cook_time}}|</span>
-        </div>
       </div>
     """
   end

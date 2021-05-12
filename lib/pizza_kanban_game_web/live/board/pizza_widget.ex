@@ -24,7 +24,7 @@ defmodule PizzaKanbanGameWeb.Board.PizzaWidget do
     case Oven.get_burning_state(pizza.cook_time) do
       :dropped -> ""
       :cooking -> "animate-pulse "
-      :heating -> "animate-pulse filter saturate-200"
+      :heating -> "animate-pulse  "
       _-> "animate-pulse"
     end
   end
