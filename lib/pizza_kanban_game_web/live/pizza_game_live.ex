@@ -14,8 +14,6 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   data game_clock, :integer, default: 0
   data oven_clock_active, :boolean, default: false
 
-  @topic "kitchen_events"
-
   @impl true
   @spec render(any) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
@@ -68,7 +66,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
     game = GameStore.get(game_id) |> create_game(game_id)
     socket = socket |> assign(:game, game)
     Logger.info("HANDLE_PARAMS 1 #{inspect(socket.assigns.game.id)} !")
-    if connected?(socket), do: Game.subscribe(@topic)
+    if connected?(socket), do: Game.subscribe(game)
     {:noreply, socket}
   end
 

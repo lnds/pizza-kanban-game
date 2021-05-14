@@ -10,20 +10,18 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
 
   require Logger
 
-  @topic "kitchen_events"
 
-  def topic, do: @topic
 
   prop game, :struct, default: nil
   data tables, :list, default: []
 
 
   def broadcast(game) do
-    Game.broadcast({:ok, game}, @topic, :update, nil)
+    Game.broadcast({:ok, game}, :update, nil)
   end
 
   def save(game) do
-    GameStore.save(game) |> Game.broadcast(@topic, :update, nil)
+    GameStore.save(game) |> Game.broadcast(:update, nil)
   end
 
 
@@ -90,7 +88,7 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
     refresh(game)
     game
       |> GameStore.save()
-      |> Game.broadcast(@topic, :update, nil)
+      |> Game.broadcast(:update, nil)
     {:noreply, assign(socket, :game, game) }
   end
 
