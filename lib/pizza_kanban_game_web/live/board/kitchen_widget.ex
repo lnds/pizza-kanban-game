@@ -18,11 +18,6 @@ defmodule PizzaKanbanGameWeb.Board.KitchenWidget do
   data tables, :list, default: []
 
 
-  def mount(socket) do
-    if connected?(socket), do: Game.subscribe(@topic)
-    {:ok, socket}
-  end
-
   def broadcast(game) do
     Game.broadcast({:ok, game}, @topic, :update, nil)
   end

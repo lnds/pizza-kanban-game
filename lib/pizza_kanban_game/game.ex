@@ -35,15 +35,16 @@ defmodule PizzaKanbanGame.Game do
     }
 
 
+  defp topic_name(_game, topic), do: "#{topic}"
 
   def subscribe(topic) do
-    Phoenix.PubSub.subscribe(PizzaKanbanGame.PubSub, topic)
+    Phoenix.PubSub.subscribe(PizzaKanbanGame.PubSub, topic_name(nil, topic))
   end
 
   def broadcast({:error, _reason} = error, _topic, _event, _data), do: error
 
   def broadcast({:ok, game}, topic, event, data) do
-    Phoenix.PubSub.broadcast(PizzaKanbanGame.PubSub, topic, {event, game, data})
+    Phoenix.PubSub.broadcast(PizzaKanbanGame.PubSub, topic_name(game, topic), {event, game, data})
     {:ok}
   end
 
