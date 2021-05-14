@@ -81,11 +81,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
 
   @impl true
   def handle_info({event, game, _}, socket) do
-    if socket.assigns.game && game.id == socket.assigns.game.id do
-      handle_game_event(event, game, socket)
-    else
-      {:noreply, socket}
-    end
+    handle_game_event(event, game, socket)
   end
 
   def handle_info(event, socket) do
