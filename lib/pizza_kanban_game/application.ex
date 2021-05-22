@@ -13,7 +13,7 @@ defmodule PizzaKanbanGame.Application do
       PizzaKanbanGame.PlayerStore,
       # Start the Endpoint (http/https)
       PizzaKanbanGameWeb.Endpoint,
-
+      PizzaKanbanGameWeb.Presence,
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

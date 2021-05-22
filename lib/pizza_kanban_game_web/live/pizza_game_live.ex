@@ -2,6 +2,7 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   use Surface.LiveView
 
   alias PizzaKanbanGameWeb.Router.Helpers, as: Routes
+  alias PizzaKanbanGameWeb.Presence
   alias PizzaKanbanGameWeb.Board.{PantryWidget, KitchenWidget, OvenWidget, OrdersWidget, ResultsWidget, ScoreWidget, ClockWidget}
   alias PizzaKanbanGame.PlayerStore
   alias PizzaKanbanGame.Game
@@ -65,8 +66,13 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   def handle_params(%{"game_id" => game_id}, _uri, socket) do
     game = GameStore.get(game_id) |> create_game(game_id)
     socket = socket |> assign(:game, game)
-    if connected?(socket), do: Game.subscribe(game)
-    {:noreply, socket}
+    initial_count = if connected?(socket) do
+      topic = Game.subscribe(game)
+      initial_count = Presence.list(topic) |> map_size
+      Presence.track(self(), topic, socket.id, %{})
+      initial_count
+    end
+    {:noreply, assign(socket, :player_count, initial_count)}
   end
 
   def handle_params(%{}, _uri, socket) do
@@ -78,9 +84,19 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   end
 
   @impl true
+  def handle_info(
+    %{event: "presence_diff", payload: %{joins: joins, leaves: leaves}},
+    %{assigns: %{player_count: count}} = socket
+      ) do
+    player_count = count + map_size(joins) - map_size(leaves)
+    Logger.info("player count = #{inspect(player_count)}")
+    {:noreply, assign(socket, :player_count, player_count)}
+  end
+
   def handle_info({event, game, _}, socket) do
     handle_game_event(event, game, socket)
   end
+
 
   def handle_info(event, socket) do
     handle_clock_event(event, socket.assigns.game, socket)

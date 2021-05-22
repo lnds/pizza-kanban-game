@@ -40,7 +40,9 @@ defmodule PizzaKanbanGame.Game do
   defp topic_name(game), do: "game:#{game.id}"
 
   def subscribe(game) do
-    Phoenix.PubSub.subscribe(PizzaKanbanGame.PubSub, topic_name(game))
+    topic = topic_name(game)
+    Phoenix.PubSub.subscribe(PizzaKanbanGame.PubSub, topic)
+    topic
   end
 
   def broadcast({:error, _reason} = error, _event, _data), do: error
