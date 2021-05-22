@@ -65,7 +65,6 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
   def handle_params(%{"game_id" => game_id}, _uri, socket) do
     game = GameStore.get(game_id) |> create_game(game_id)
     socket = socket |> assign(:game, game)
-    Logger.info("HANDLE_PARAMS 1 #{inspect(socket.assigns.game.id)} !")
     if connected?(socket), do: Game.subscribe(game)
     {:noreply, socket}
   end
@@ -75,7 +74,6 @@ defmodule PizzaKanbanGameWeb.PizzaGameLive do
     game = Game.new(player.name, player)
     GameStore.save(game)
     socket = socket |> assign(:game, game)
-    Logger.info("HANDLE_PARAMS 2 #{inspect(socket.assigns.game.id)} !")
     {:noreply, push_redirect(socket,  to: "/#{game.id}", replace: true)}
   end
 
