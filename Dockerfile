@@ -45,6 +45,7 @@ USER nobody:nobody
 
 COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/my_app ./
 
-ENV HOME=/app
+ENV HOME=/app 
+ENV SECRET_KEY_BASE=${SECRET_KEY_BASE}
 
 CMD ["bin/my_app", "start"]
