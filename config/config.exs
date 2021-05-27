@@ -7,6 +7,12 @@
 # General application configuration
 use Mix.Config
 
+config :pizza_kanban_game, PizzaKanbanGame.Repo,
+  database: "pizza_kanban_game_repo",
+  username: "user",
+  password: "pass",
+  hostname: "localhost"
+
 config :pizza_kanban_game,
   ecto_repos: [PizzaKanbanGame.Repo]
 
